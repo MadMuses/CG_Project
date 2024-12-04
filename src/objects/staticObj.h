@@ -6,21 +6,21 @@
 
 // Other relevant structs
 #include "commonStructs.h"
-#ifndef MYBOT_H
-#define MYBOT_H
+
+#ifndef STATICOBJ_H
+#define STATICOBJ_H
 
 
-struct myBot {
+struct staticObj {
 
     // Constructors
-    myBot();
-    ~myBot();
+    staticObj();
+    ~staticObj();
 
     // Methods
 
     // Base use fonctions used outside struct
     void initialize(GLuint programID,const char *filename);
-    void update(float time);
     void render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity);
     void cleanup();
 
@@ -31,7 +31,6 @@ struct myBot {
 
     // Prepare loading
     std::vector<SkinObject> prepareSkinning(const tinygltf::Model &model);
-    std::vector<AnimationObject> prepareAnimation(const tinygltf::Model &model);
 
     // Loading
     bool loadModel(tinygltf::Model &model, const char *filename);
@@ -42,17 +41,10 @@ struct myBot {
     void bindModelNodes(std::vector<PrimitiveObject> &primitiveObjects,tinygltf::Model &model,tinygltf::Node &node);
     std::vector<PrimitiveObject> bindModel(tinygltf::Model &model);
 
-    // Updates fonctions
-    void updateAnimation(const tinygltf::Model &model, const tinygltf::Animation &anim, const AnimationObject &animationObject, float time, std::vector<glm::mat4> &nodeTransforms);
-    void updateSkinning(const std::vector<glm::mat4> &nodeTransforms);
-
     // Draw functions
     void drawMesh(const std::vector<PrimitiveObject> &primitiveObjects, tinygltf::Model &model, tinygltf::Mesh &mesh);
     void drawModelNodes(const std::vector<PrimitiveObject>& primitiveObjects, tinygltf::Model &model, tinygltf::Node &node);
     void drawModel(const std::vector<PrimitiveObject>& primitiveObjects, tinygltf::Model &model);
-
-    // Helper functions
-    int findKeyframeIndex(const std::vector<float>& times, float animationTime);
 
     // Variables
 
@@ -73,10 +65,9 @@ struct myBot {
     tinygltf::Model model;
     std::vector<PrimitiveObject> primitiveObjects;
     std::vector<SkinObject> skinObjects;
-    std::vector<AnimationObject> animationObjects;
     std::vector<MaterialObject> materialObjects;
 };
 
 
 
-#endif //MYBOT_H
+#endif //STATICOBJ_H

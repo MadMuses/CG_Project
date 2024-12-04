@@ -25,6 +25,7 @@
 
 // Objects include
 #include "objects/myBot.h"
+#include "objects/staticObj.h"
 
 // Static elements
 static GLFWwindow *window;
@@ -39,11 +40,11 @@ static glm::vec3 eye_center(80.0f, 0.0f, 80.0f);
 static glm::vec3 lookat(0.0f, 0.0f, 0.0f);
 static glm::vec3 up(0.0f, 1.0f, 0.0f);
 static float FoV = 45.0f;
-static float zNear = 2.0f;
+static float zNear = 10.0f;
 static float zFar = 1500.0f;
 
 // Lighting
-static glm::vec3 lightIntensity(5e6f, 5e6f, 5e6f);
+static glm::vec3 lightIntensity(10e6f, 10e6f, 10e6f);
 static glm::vec3 lightPosition(-275.0f, 500.0f, 800.0f);
 
 int main(void)
@@ -69,7 +70,7 @@ int main(void)
     }
 
     // Our 3D character
-    myBot dome;
+    staticObj dome;
     dome.initialize(programID,"../src/models/dome/dome.gltf");
 
     // Time and frame rate tracking
