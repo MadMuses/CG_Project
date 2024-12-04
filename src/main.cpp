@@ -21,21 +21,25 @@
 
 // Files import
 #include <render/shader.h>
-#include "helpers.cpp"
+#include "helpers.h"
 
 // Objects include
+#include "objects/myBot.h"
 
 // Static elements
 static GLFWwindow *window;
 static int windowWidth = 1024;
 static int windowHeight = 768;
 
+// Call back functions
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
+
 // Camera
-static glm::vec3 eye_center(0.0f, 100.0f, 800.0f);
+static glm::vec3 eye_center(0.0f, 80.0f, 80.0f);
 static glm::vec3 lookat(0.0f, 0.0f, 0.0f);
 static glm::vec3 up(0.0f, 1.0f, 0.0f);
 static float FoV = 45.0f;
-static float zNear = 100.0f;
+static float zNear = 10.0f;
 static float zFar = 1500.0f;
 
 // Lighting
@@ -48,11 +52,31 @@ int main(void)
     window = initOpenGL(windowWidth, windowHeight);
     if (window == NULL){return -1;};
 
+    // Ensure we can capture the escape key being pressed below
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    glfwSetKeyCallback(window, key_callback);
+
     // Background
     glClearColor(0.2f, 0.2f, 0.2f, 0.f);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+
+    GLuint programID = LoadShadersFromFile("../src/shaders/bot.vert", "../src/shaders/bot.frag");
+    if (programID == 0)
+    {
+        std::cerr << "Failed to load shaders." << std::endl;
+    }
+
+    // Our 3D character
+    myBot dome;
+    dome.initialize(programID,"../src/models/dome/dome.gltf");
+
+    // Time and frame rate tracking
+    static double lastTime = glfwGetTime();
+    float time = 0.0f;			// Animation time
+    float fTime = 0.0f;			// Time for measuring fps
+    unsigned long frames = 0;
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -61,9 +85,30 @@ int main(void)
     do
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // Camera view point
+
+        // Update states for animation
+        double currentTime = glfwGetTime();
+        float deltaTime = float(currentTime - lastTime);
+        lastTime = currentTime;
+
+        // Rendering
         viewMatrix = glm::lookAt(eye_center, lookat, up);
         glm::mat4 vp = projectionMatrix * viewMatrix;
+        dome.render(vp,lightPosition,lightIntensity);
+
+        // FPS tracking
+        // Count number of frames over a few seconds and take average
+        frames++;
+        fTime += deltaTime;
+        if (fTime > 2.0f) {
+            float fps = frames / fTime;
+            frames = 0;
+            fTime = 0;
+
+            std::stringstream stream;
+            stream << std::fixed << std::setprecision(2) << "Final Project | Frames per second (FPS): " << fps;
+            glfwSetWindowTitle(window, stream.str().c_str());
+        }
 
         // Swap buffers
         glfwSwapBuffers(window);
@@ -79,3 +124,19 @@ int main(void)
 
     return 0;
 }
+
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
+{
+    if ((key == GLFW_KEY_Z || key == GLFW_KEY_W) && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+    }
+    if ((key == GLFW_KEY_Q || key == GLFW_KEY_A) && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+    }
+    if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+    }
+    if (key == GLFW_KEY_D && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+    }
+};
