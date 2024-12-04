@@ -21,7 +21,8 @@ include_directories(
 add_executable(main
 	src/render/shader.cpp
 	src/main.cpp
-	src/helpers.h
+	src/helpers.cpp
+	src/objects/myBot.cpp
 )
 target_link_libraries(main
 	${OPENGL_LIBRARY}
