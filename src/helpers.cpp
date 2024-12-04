@@ -14,7 +14,7 @@ GLFWwindow* initOpenGL(int windowWidth, int windowHeight){
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
-    GLFWwindow *window = glfwCreateWindow(windowWidth, windowHeight, "Lab 3", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(windowWidth, windowHeight, "Final project", NULL, NULL);
     if (window == NULL)
     {
         std::cerr << "Failed to open a GLFW window." << std::endl;
@@ -33,4 +33,3 @@ GLFWwindow* initOpenGL(int windowWidth, int windowHeight){
     return window;
 };
 
-static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode){};

@@ -14,6 +14,6 @@
 #include <iomanip>
 
 GLFWwindow* initOpenGL(int windowWidth, int windowHeight);
-void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
+
 
 #endif //HELPERS_H
