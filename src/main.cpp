@@ -35,11 +35,11 @@ static int windowHeight = 768;
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 
 // Camera
-static glm::vec3 eye_center(0.0f, 80.0f, 80.0f);
+static glm::vec3 eye_center(80.0f, 0.0f, 80.0f);
 static glm::vec3 lookat(0.0f, 0.0f, 0.0f);
 static glm::vec3 up(0.0f, 1.0f, 0.0f);
 static float FoV = 45.0f;
-static float zNear = 10.0f;
+static float zNear = 2.0f;
 static float zFar = 1500.0f;
 
 // Lighting
@@ -125,18 +125,67 @@ int main(void)
     return 0;
 }
 
+// Movement variables
+GLfloat moveDist = 1.0f;
+GLfloat moveAngle = glm::radians(3.0f);
+glm::vec3 v;
+glm::mat4 moveRotationMat;
+
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
 {
-    if ((key == GLFW_KEY_Z || key == GLFW_KEY_W) && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    if (action == GLFW_REPEAT || action == GLFW_PRESS)
     {
-    }
-    if ((key == GLFW_KEY_Q || key == GLFW_KEY_A) && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    {
-    }
-    if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    {
-    }
-    if (key == GLFW_KEY_D && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    {
+        v = normalize(lookat-eye_center);
+        // Person movement
+
+        // Forward
+        if (key == GLFW_KEY_Z || key == GLFW_KEY_W)
+        {
+            eye_center += moveDist * glm::vec3(v.x,0,v.z);
+            lookat += moveDist * glm::vec3(v.x,0,v.z);
+        }
+        // Backward
+        if (key == GLFW_KEY_S)
+        {
+            eye_center -= moveDist * glm::vec3(v.x,0,v.z);
+            lookat -= moveDist * glm::vec3(v.x,0,v.z);
+        }
+        // Left
+        if (key == GLFW_KEY_Q || key == GLFW_KEY_A)
+        {
+            eye_center += moveDist * glm::vec3(cross(up,v).x,0,cross(up,v).z);
+            lookat += moveDist * glm::vec3(cross(up,v).x,0,cross(up,v).z);
+        }
+        // Right
+        if (key == GLFW_KEY_D)
+        {
+            eye_center -= moveDist * glm::vec3(cross(up,v).x,0,cross(up,v).z);
+            lookat -= moveDist * glm::vec3(cross(up,v).x,0,cross(up,v).z);
+        }
+
+        // Handling view movement
+        if (key == GLFW_KEY_UP)
+        {
+            moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle*0.75f, cross(v,up));
+            lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+        }
+
+        if (key == GLFW_KEY_DOWN)
+        {
+            moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle*0.75f, cross(up,v));
+            lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+        }
+
+        if (key == GLFW_KEY_LEFT)
+        {
+            moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle, up);
+            lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+        }
+
+        if (key == GLFW_KEY_RIGHT)
+        {
+            moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle, -up);
+            lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+        }
     }
 };
