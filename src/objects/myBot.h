@@ -6,10 +6,19 @@
 
 // Other relevant structs
 
+// Each primitive contains a given material
+struct MaterialObject
+{
+    glm::vec4 BaseColorFactor;
+    GLfloat MetallicFactor;
+    GLfloat RoughnessFactor;
+};
+
 // Each VAO corresponds to each mesh primitive in the GLTF model
 struct PrimitiveObject {
     GLuint vao;
     std::map<int, GLuint> vbos;
+    MaterialObject material;
 };
 
 // Skinning
@@ -70,6 +79,7 @@ struct myBot {
     bool loadModel(tinygltf::Model &model, const char *filename);
 
     // Binding
+    std::vector<MaterialObject> bindMaterials(tinygltf::Model &model);
     void bindMesh(std::vector<PrimitiveObject> &primitiveObjects,tinygltf::Model &model, tinygltf::Mesh &mesh);
     void bindModelNodes(std::vector<PrimitiveObject> &primitiveObjects,tinygltf::Model &model,tinygltf::Node &node);
     std::vector<PrimitiveObject> bindModel(tinygltf::Model &model);
@@ -96,11 +106,17 @@ struct myBot {
     GLuint lightIntensityID;
     GLuint programID;
 
+    // Material uniform handler idea
+    GLuint materialUniID;
+    GLuint metallicUniID;
+    GLuint roughnessUniID;
+
     // Model related variables
     tinygltf::Model model;
     std::vector<PrimitiveObject> primitiveObjects;
     std::vector<SkinObject> skinObjects;
     std::vector<AnimationObject> animationObjects;
+    std::vector<MaterialObject> materialObjects;
 };
 
 

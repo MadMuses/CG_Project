@@ -361,6 +361,9 @@ void myBot::initialize(GLuint programID, const char *filename) {
 		return;
 	}
 
+	// Prepare materials for meshes
+	materialObjects = bindMaterials(model);
+
 	// Prepare buffers for rendering
 	primitiveObjects = bindModel(model);
 
@@ -377,6 +380,10 @@ void myBot::initialize(GLuint programID, const char *filename) {
 	lightPositionID = glGetUniformLocation(programID, "lightPosition");
 	lightIntensityID = glGetUniformLocation(programID, "lightIntensity");
 
+	materialUniID = glGetUniformLocation(programID, "baseColorFactor");
+	metallicUniID = glGetUniformLocation(programID, "metallicFactor");
+	roughnessUniID = glGetUniformLocation(programID, "roughnessFactor");
+
 	// Generate what's necessary for the passage of the jointMatrices to the shader
 	// NB : To make it more adaptable, we'll need to pass the size of the vector as another uniform to the shader
 	glGenBuffers(1, &jointMatricesID);
@@ -388,6 +395,27 @@ void myBot::initialize(GLuint programID, const char *filename) {
 	glUniformBlockBinding(programID, ubo_jointMatricesID, 0);  // 0 est le binding point du UBO
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, jointMatricesID);
 }
+
+std::vector<MaterialObject> myBot::bindMaterials(tinygltf::Model &model)
+{
+	std::vector<MaterialObject> materialObjects;
+	for (size_t i=0; i< model.materials.size();i++)
+	{
+		const tinygltf::Material &fetchedmaterial = model.materials[i];
+		MaterialObject material;
+		material.BaseColorFactor = glm::vec4(1.0f);
+		// Fixed to 4 as it is RGBa
+		for (size_t j =0; j < 4; j++)
+		{
+			material.BaseColorFactor[j] = fetchedmaterial.pbrMetallicRoughness.baseColorFactor[j];
+		}
+		material.MetallicFactor = fetchedmaterial.pbrMetallicRoughness.metallicFactor;
+		material.RoughnessFactor = fetchedmaterial.pbrMetallicRoughness.roughnessFactor;
+
+		materialObjects.push_back(material);
+	}
+	return materialObjects;
+};
 
 void myBot::bindMesh(std::vector<PrimitiveObject> &primitiveObjects,
 			tinygltf::Model &model, tinygltf::Mesh &mesh) {
@@ -458,6 +486,19 @@ void myBot::bindMesh(std::vector<PrimitiveObject> &primitiveObjects,
 		PrimitiveObject primitiveObject;
 		primitiveObject.vao = vao;
 		primitiveObject.vbos = vbos;
+
+		// Fetch current material
+		MaterialObject material = materialObjects[primitive.material];
+
+		// Update for first render
+		glUniform4fv(materialUniID, 1, &material.BaseColorFactor[0]);
+		glUniform1fv(metallicUniID, 1, &material.MetallicFactor);
+		glUniform1fv(roughnessUniID, 1, &material.RoughnessFactor);
+
+		// Store material in primitive object
+		primitiveObject.material = material;
+
+		// Store in the general vector
 		primitiveObjects.push_back(primitiveObject);
 
 		glBindVertexArray(0);
@@ -503,6 +544,10 @@ void myBot::drawMesh(const std::vector<PrimitiveObject> &primitiveObjects,
 
 		tinygltf::Primitive primitive = mesh.primitives[i];
 		tinygltf::Accessor indexAccessor = model.accessors[primitive.indices];
+
+		glUniform4fv(materialUniID, 1, &primitiveObjects[i].material.BaseColorFactor[0]);
+		glUniform1fv(metallicUniID, 1, &primitiveObjects[i].material.MetallicFactor);
+		glUniform1fv(roughnessUniID, 1, &primitiveObjects[i].material.RoughnessFactor);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos.at(indexAccessor.bufferView));
 
