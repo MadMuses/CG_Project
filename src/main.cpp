@@ -24,7 +24,6 @@
 #include "helpers.h"
 
 // Objects include
-#include "objects/myBot.h"
 #include "objects/staticObj.h"
 
 // Static elements
@@ -36,8 +35,8 @@ static int windowHeight = 768;
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 
 // Camera
-static glm::vec3 eye_center(0.0f, 1000.0f, 0.0f);
-static glm::vec3 lookat(100.0f, 0.0f, 0.0f);
+static glm::vec3 eye_center(80.0f, 0.0f, 0.0f);
+static glm::vec3 lookat(0.0f, 0.0f, 0.0f);
 static glm::vec3 up(0.0f, 1.0f, 0.0f);
 static float FoV = 45.0f;
 static float zNear = 10.0f;
@@ -46,6 +45,10 @@ static float zFar = 1500.0f;
 // Lighting
 static glm::vec3 lightIntensity(5e6f, 5e6f, 5e6f);
 static glm::vec3 lightPosition(0.0, 0.0f, 0.0f);
+
+// Animation
+static bool playAnimation = true;
+static float playbackSpeed = 2.0f;
 
 int main(void)
 {
@@ -71,7 +74,10 @@ int main(void)
 
     // Our 3D character
     staticObj dome;
-    dome.initialize(programID,"../src/models/dome/dome.gltf", glm::vec3(0.0f),glm::vec3(500.0f));
+    dome.initialize(programID,0,"../src/models/dome/dome.gltf", glm::vec3(0.0f),glm::vec3(500.0f));
+
+    staticObj bot;
+    bot.initialize(programID,1,"../src/models/bot/bot.gltf");
 
     // Time and frame rate tracking
     static double lastTime = glfwGetTime();
@@ -95,6 +101,8 @@ int main(void)
         // Rendering
         viewMatrix = glm::lookAt(eye_center, lookat, up);
         glm::mat4 vp = projectionMatrix * viewMatrix;
+
+        bot.render(vp,lightPosition,lightIntensity);
         dome.render(vp,lightPosition,lightIntensity);
 
         // FPS tracking
@@ -109,6 +117,10 @@ int main(void)
             std::stringstream stream;
             stream << std::fixed << std::setprecision(2) << "Final Project | Frames per second (FPS): " << fps;
             glfwSetWindowTitle(window, stream.str().c_str());
+        }
+
+        if (playAnimation) {
+            time += deltaTime * playbackSpeed;
         }
 
         // Swap buffers

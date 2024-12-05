@@ -343,7 +343,7 @@ void staticObj::drawModel(const std::vector<PrimitiveObject>& primitiveObjects,
 	}
 }
 
-void staticObj::initialize(GLuint programID, const char *filename,
+void staticObj::initialize(GLuint programID, int blockBindID, const char *filename,
 	glm::vec3 position, glm::vec3 scale, glm::vec3 rotationAxis,GLfloat rotationAngle) {
 
 	// Basic transforms
@@ -368,6 +368,7 @@ void staticObj::initialize(GLuint programID, const char *filename,
 
 	// Get shader program
 	this -> programID = programID;
+	this -> blockBindID = blockBindID;
 
 	// Get a handle for GLSL variables
 	mvpMatrixID = glGetUniformLocation(programID, "MVP");
@@ -380,14 +381,20 @@ void staticObj::initialize(GLuint programID, const char *filename,
 
 	// Generate what's necessary for the passage of the jointMatrices to the shader
 	// NB : To make it more adaptable, we'll need to pass the size of the vector as another uniform to the shader
+/*
+	howManyJointsID = glGetUniformLocation(programID, "howManyJoints");
+	int thatManyJoints = skinObjects[0].jointMatrices.size();
+	std::cout << std::endl << thatManyJoints << std::endl;
+	glUniform1iv(howManyJointsID, 1, &thatManyJoints);
+*/
 	glGenBuffers(1, &jointMatricesID);
 	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
 	glBufferData(GL_UNIFORM_BUFFER, skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data(), GL_DYNAMIC_DRAW);
 
 	// Creating a uniform block index
 	ubo_jointMatricesID = glGetUniformBlockIndex(programID, "jointMatrices");
-	glUniformBlockBinding(programID, ubo_jointMatricesID, 0);  // 0 est le binding point du UBO
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, jointMatricesID);
+	glUniformBlockBinding(programID, ubo_jointMatricesID, blockBindID);  // 0 est le binding point du UBO
+	glBindBufferBase(GL_UNIFORM_BUFFER, blockBindID, jointMatricesID);
 }
 
 void staticObj::render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity) {
@@ -415,11 +422,18 @@ void staticObj::render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 
 	// -----------------------------------------------------------------
 	// TODO: Set animation data for linear blend skinning in shader
 	// -----------------------------------------------------------------
+/*
+	int thatManyJoints = skinObjects[0].jointMatrices.size();
+	std::cout << std::endl << thatManyJoints << std::endl;
+	glUniform1iv(howManyJointsID, 1, &thatManyJoints);
+*/
+	// Use the relevant blockBind buffer
+	glUniformBlockBinding(programID, ubo_jointMatricesID, blockBindID);  // 0 est le binding point du UBO
+	glBindBufferBase(GL_UNIFORM_BUFFER, blockBindID, jointMatricesID);
 
 	// Get the data into the buffer for access in the shaders
 	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0,skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data());
-
 	// -----------------------------------------------------------------
 
 	// Set light data

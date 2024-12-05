@@ -22,7 +22,6 @@ add_executable(main
 	src/render/shader.cpp
 	src/main.cpp
 	src/helpers.cpp
-	src/objects/myBot.cpp
 	src/objects/staticObj.cpp
 )
 target_link_libraries(main

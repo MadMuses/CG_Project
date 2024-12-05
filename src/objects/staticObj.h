@@ -20,7 +20,7 @@ struct staticObj {
     // Methods
 
     // Base use fonctions used outside struct
-    void initialize(GLuint programID,const char *filename,
+    void initialize(GLuint programID, int blockBindID,const char *filename,
         glm::vec3 position = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f),glm::vec3 rotationAxis = glm::vec3(0.0f),GLfloat rotationAngle = 0.0f);
     void render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity);
     void cleanup();
@@ -56,9 +56,11 @@ struct staticObj {
     GLfloat rotationAngle;
 
     // Shader variable IDs
+    GLuint blockBindID;
     GLuint mvpMatrixID;
     GLuint jointMatricesID;
     GLuint ubo_jointMatricesID;
+    GLuint howManyJointsID;
     GLuint lightPositionID;
     GLuint lightIntensityID;
     GLuint programID;
