@@ -36,16 +36,16 @@ static int windowHeight = 768;
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 
 // Camera
-static glm::vec3 eye_center(80.0f, 0.0f, 80.0f);
-static glm::vec3 lookat(0.0f, 0.0f, 0.0f);
+static glm::vec3 eye_center(0.0f, 1000.0f, 0.0f);
+static glm::vec3 lookat(100.0f, 0.0f, 0.0f);
 static glm::vec3 up(0.0f, 1.0f, 0.0f);
 static float FoV = 45.0f;
 static float zNear = 10.0f;
 static float zFar = 1500.0f;
 
 // Lighting
-static glm::vec3 lightIntensity(10e6f, 10e6f, 10e6f);
-static glm::vec3 lightPosition(-275.0f, 500.0f, 800.0f);
+static glm::vec3 lightIntensity(5e6f, 5e6f, 5e6f);
+static glm::vec3 lightPosition(0.0, 0.0f, 0.0f);
 
 int main(void)
 {
@@ -71,7 +71,7 @@ int main(void)
 
     // Our 3D character
     staticObj dome;
-    dome.initialize(programID,"../src/models/dome/dome.gltf");
+    dome.initialize(programID,"../src/models/dome/dome.gltf", glm::vec3(0.0f),glm::vec3(500.0f));
 
     // Time and frame rate tracking
     static double lastTime = glfwGetTime();
@@ -167,20 +167,27 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         // Handling view movement
         if (key == GLFW_KEY_UP)
         {
-            moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle*0.75f, cross(v,up));
-            lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+            if (v.y < 0.999) // Safeguard to prevent bugs
+            {
+                moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle*0.75f, cross(v,up));
+                lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+            }
         }
 
         if (key == GLFW_KEY_DOWN)
         {
-            moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle*0.75f, cross(up,v));
-            lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+            if (v.y > -0.996) // Safeguard to prevent bugs
+            {
+                moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle*0.75f, cross(up,v));
+                lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+            }
         }
 
         if (key == GLFW_KEY_LEFT)
         {
             moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle, up);
             lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
+
         }
 
         if (key == GLFW_KEY_RIGHT)

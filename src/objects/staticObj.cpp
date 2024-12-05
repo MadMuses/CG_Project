@@ -161,45 +161,6 @@ bool staticObj::loadModel(tinygltf::Model &model, const char *filename) {
 	return res;
 }
 
-void staticObj::initialize(GLuint programID, const char *filename) {
-	// Modify your path if needed
-	if (!loadModel(model, filename)) {
-		return;
-	}
-
-	// Prepare materials for meshes
-	materialObjects = bindMaterials(model);
-
-	// Prepare buffers for rendering
-	primitiveObjects = bindModel(model);
-
-	// Prepare joint matrices
-	skinObjects = prepareSkinning(model);
-
-	// Get shader program
-	this -> programID = programID;
-
-	// Get a handle for GLSL variables
-	mvpMatrixID = glGetUniformLocation(programID, "MVP");
-	lightPositionID = glGetUniformLocation(programID, "lightPosition");
-	lightIntensityID = glGetUniformLocation(programID, "lightIntensity");
-
-	materialUniID = glGetUniformLocation(programID, "baseColorFactor");
-	metallicUniID = glGetUniformLocation(programID, "metallicFactor");
-	roughnessUniID = glGetUniformLocation(programID, "roughnessFactor");
-
-	// Generate what's necessary for the passage of the jointMatrices to the shader
-	// NB : To make it more adaptable, we'll need to pass the size of the vector as another uniform to the shader
-	glGenBuffers(1, &jointMatricesID);
-	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
-	glBufferData(GL_UNIFORM_BUFFER, skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data(), GL_DYNAMIC_DRAW);
-
-	// Creating a uniform block index
-	ubo_jointMatricesID = glGetUniformBlockIndex(programID, "jointMatrices");
-	glUniformBlockBinding(programID, ubo_jointMatricesID, 0);  // 0 est le binding point du UBO
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, jointMatricesID);
-}
-
 std::vector<MaterialObject> staticObj::bindMaterials(tinygltf::Model &model)
 {
 	std::vector<MaterialObject> materialObjects;
@@ -382,11 +343,73 @@ void staticObj::drawModel(const std::vector<PrimitiveObject>& primitiveObjects,
 	}
 }
 
+void staticObj::initialize(GLuint programID, const char *filename,
+	glm::vec3 position, glm::vec3 scale, glm::vec3 rotationAxis,GLfloat rotationAngle) {
+
+	// Basic transforms
+	this -> position = position;
+	this -> scale = scale;
+	this -> rotationAxis = rotationAxis;
+	this -> rotationAngle = rotationAngle;
+
+	// Modify your path if needed
+	if (!loadModel(model, filename)) {
+		return;
+	}
+
+	// Prepare materials for meshes
+	materialObjects = bindMaterials(model);
+
+	// Prepare buffers for rendering
+	primitiveObjects = bindModel(model);
+
+	// Prepare joint matrices
+	skinObjects = prepareSkinning(model);
+
+	// Get shader program
+	this -> programID = programID;
+
+	// Get a handle for GLSL variables
+	mvpMatrixID = glGetUniformLocation(programID, "MVP");
+	lightPositionID = glGetUniformLocation(programID, "lightPosition");
+	lightIntensityID = glGetUniformLocation(programID, "lightIntensity");
+
+	materialUniID = glGetUniformLocation(programID, "baseColorFactor");
+	metallicUniID = glGetUniformLocation(programID, "metallicFactor");
+	roughnessUniID = glGetUniformLocation(programID, "roughnessFactor");
+
+	// Generate what's necessary for the passage of the jointMatrices to the shader
+	// NB : To make it more adaptable, we'll need to pass the size of the vector as another uniform to the shader
+	glGenBuffers(1, &jointMatricesID);
+	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
+	glBufferData(GL_UNIFORM_BUFFER, skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data(), GL_DYNAMIC_DRAW);
+
+	// Creating a uniform block index
+	ubo_jointMatricesID = glGetUniformBlockIndex(programID, "jointMatrices");
+	glUniformBlockBinding(programID, ubo_jointMatricesID, 0);  // 0 est le binding point du UBO
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, jointMatricesID);
+}
+
 void staticObj::render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity) {
 	glUseProgram(programID);
 
+	// Set transforms
+	glm::mat4 modelMatrix = glm::mat4();
+
+	// Translate the box to its position
+	modelMatrix = glm::translate(modelMatrix, position);
+
+	// Scale the box along each axis
+	modelMatrix = glm::scale(modelMatrix, scale);
+
+
+	// Rotate the box along the chosen axis
+	if (rotationAngle != 0) {
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotationAngle), rotationAxis);
+	}
+
 	// Set camera
-	glm::mat4 mvp = cameraMatrix;
+	glm::mat4 mvp = cameraMatrix*modelMatrix;
 	glUniformMatrix4fv(mvpMatrixID, 1, GL_FALSE, &mvp[0][0]);
 
 	// -----------------------------------------------------------------
