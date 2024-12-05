@@ -10,7 +10,6 @@
 #ifndef STATICOBJ_H
 #define STATICOBJ_H
 
-
 struct staticObj {
 
     // Constructors

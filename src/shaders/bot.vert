@@ -32,11 +32,10 @@ void main() {
         + jointMatricesVec[int(j_IDs.z)]* normweights.z
         + jointMatricesVec[int(j_IDs.w)]* normweights.w;
 
-    // World-space geometry 
-    worldPosition = (MVP * skinMat * vec4(vertexPosition,1)).xyz;
-
-    // change the normal accroding to skinning
     mat4 skinMatNormal = transpose(inverse(skinMat));
+
+    // World-space geometry
+    worldPosition = (MVP * skinMat * vec4(vertexPosition,1)).xyz;
     worldNormal = normalize(skinMatNormal * vec4(vertexNormal, 0.0)).xyz;
 
     // Transform vertex
