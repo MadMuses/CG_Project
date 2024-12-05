@@ -13,7 +13,10 @@
 #include <math.h>
 #include <iomanip>
 
+
+
 GLFWwindow* initOpenGL(int windowWidth, int windowHeight);
 void printVec(glm::vec3 v);
+GLuint LoadTextureTileBox(const char *texture_file_path);
 
 #endif //HELPERS_H
