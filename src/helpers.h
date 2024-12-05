@@ -14,6 +14,6 @@
 #include <iomanip>
 
 GLFWwindow* initOpenGL(int windowWidth, int windowHeight);
-
+void printVec(glm::vec3 v);
 
 #endif //HELPERS_H

@@ -33,3 +33,7 @@ GLFWwindow* initOpenGL(int windowWidth, int windowHeight){
     return window;
 };
 
+void printVec(glm::vec3 v)
+{
+    std::cout << std::endl << "[" << v.x << ", " << v.y << ", " << v.z << "]" << std::endl;
+}
