@@ -137,37 +137,39 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (action == GLFW_REPEAT || action == GLFW_PRESS)
     {
         v = normalize(lookat-eye_center);
+        glm::vec3 dirVect = normalize(glm::vec3(v.x,0,v.z));
+        glm::vec3 dirSide = normalize(glm::vec3(cross(up,v).x,0,cross(up,v).z));
         // Person movement
 
         // Forward
         if (key == GLFW_KEY_Z || key == GLFW_KEY_W)
         {
-            eye_center += moveDist * glm::vec3(v.x,0,v.z);
-            lookat += moveDist * glm::vec3(v.x,0,v.z);
+            eye_center += moveDist * dirVect;
+            lookat += moveDist * dirVect;
         }
         // Backward
         if (key == GLFW_KEY_S)
         {
-            eye_center -= moveDist * glm::vec3(v.x,0,v.z);
-            lookat -= moveDist * glm::vec3(v.x,0,v.z);
+            eye_center -= moveDist * dirVect;
+            lookat -= moveDist * dirVect;
         }
         // Left
         if (key == GLFW_KEY_Q || key == GLFW_KEY_A)
         {
-            eye_center += moveDist * glm::vec3(cross(up,v).x,0,cross(up,v).z);
-            lookat += moveDist * glm::vec3(cross(up,v).x,0,cross(up,v).z);
+            eye_center += moveDist * dirSide;
+            lookat += moveDist * dirSide;
         }
         // Right
         if (key == GLFW_KEY_D)
         {
-            eye_center -= moveDist * glm::vec3(cross(up,v).x,0,cross(up,v).z);
-            lookat -= moveDist * glm::vec3(cross(up,v).x,0,cross(up,v).z);
+            eye_center -= moveDist * dirSide;
+            lookat -= moveDist * dirSide;
         }
 
         // Handling view movement
         if (key == GLFW_KEY_UP)
         {
-            if (v.y < 0.999) // Safeguard to prevent bugs
+            if (v.y < 0.999) // Safeguard to prevent visual bugs
             {
                 moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle*0.75f, cross(v,up));
                 lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
@@ -176,7 +178,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
         if (key == GLFW_KEY_DOWN)
         {
-            if (v.y > -0.996) // Safeguard to prevent bugs
+            if (v.y > -0.996) // Safeguard to prevent visual bugs
             {
                 moveRotationMat = glm::rotate(glm::mat4(1.0f), moveAngle*0.75f, cross(up,v));
                 lookat = eye_center + glm::vec3(moveRotationMat*glm::vec4(v,1.0f));
