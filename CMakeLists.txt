@@ -23,6 +23,7 @@ add_executable(main
 	src/main.cpp
 	src/helpers.cpp
 	src/objects/staticObj.cpp
+	src/objects/myBot.cpp
 )
 target_link_libraries(main
 	${OPENGL_LIBRARY}

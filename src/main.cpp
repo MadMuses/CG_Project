@@ -25,6 +25,7 @@
 
 // Objects include
 #include "objects/staticObj.h"
+#include "objects/myBot.h"
 
 // Static elements
 static GLFWwindow *window;
@@ -35,8 +36,8 @@ static int windowHeight = 768;
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 
 // Camera
-static glm::vec3 eye_center(80.0f, 0.0f, 0.0f);
-static glm::vec3 lookat(0.0f, 0.0f, 0.0f);
+static glm::vec3 eye_center(0.0f, 0.0f, 0.0f);
+static glm::vec3 lookat(100.0f, 0.0f, 0.0f);
 static glm::vec3 up(0.0f, 1.0f, 0.0f);
 static float FoV = 45.0f;
 static float zNear = 10.0f;
@@ -76,7 +77,7 @@ int main(void)
     staticObj dome;
     dome.initialize(programID,0,"../src/models/dome/dome.gltf", glm::vec3(0.0f),glm::vec3(500.0f));
 
-    staticObj bot;
+    myBot bot;
     bot.initialize(programID,1,"../src/models/bot/bot.gltf");
 
     // Time and frame rate tracking
@@ -121,6 +122,7 @@ int main(void)
 
         if (playAnimation) {
             time += deltaTime * playbackSpeed;
+            bot.update(time);
         }
 
         // Swap buffers
