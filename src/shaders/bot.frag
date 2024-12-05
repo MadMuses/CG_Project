@@ -37,5 +37,5 @@ void main()
 	v = pow(v, vec3(1.0 / 2.2));
 
 	// Gamma correction
-	finalColor = v;
+	finalColor = color;
 }
