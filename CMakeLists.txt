@@ -22,9 +22,9 @@ add_executable(main
 	src/render/shader.cpp
 	src/main.cpp
 	src/helpers.cpp
-	src/objects/staticObj.cpp
-	src/objects/myBot.cpp
-	src/objects/skybox.cpp
+	src/objects/obj/staticObj.cpp
+	src/objects/bot/myBot.cpp
+	src/objects/skybox/skybox.cpp
 )
 target_link_libraries(main
 	${OPENGL_LIBRARY}

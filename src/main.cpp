@@ -23,9 +23,9 @@
 #include "helpers.h"
 
 // Objects include
-#include "objects/staticObj.h"
-#include "objects/myBot.h"
-#include "objects/skybox.h"
+#include "objects/obj/staticObj.h"
+#include "objects/bot/myBot.h"
+#include "objects/skybox/skybox.h"
 
 // Static elements
 static GLFWwindow *window;
@@ -41,7 +41,7 @@ static glm::vec3 lookat(0.0f, 0.0f, 100.0f);
 static glm::vec3 up(0.0f, 1.0f, 0.0f);
 static float FoV = 45.0f;
 static float zNear = 10.0f;
-static float zFar = 1500.0f;
+static float zFar = 3000.0f;
 
 // Lighting
 static glm::vec3 lightIntensity(5e6f, 5e6f, 5e6f);
@@ -75,7 +75,7 @@ int main(void)
 
     // Our 3D character
     staticObj dome;
-    dome.initialize(programID,0,"../assets/models/dome/dome.gltf", glm::vec3(0.0f),glm::vec3(50.0f));
+    dome.initialize(programID,0,"../assets/models/dome/dome.gltf", glm::vec3(0.0f),glm::vec3(100.0f));
 
     myBot bot;
     bot.initialize(programID,1,"../assets/models/bot/bot.gltf");
