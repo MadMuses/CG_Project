@@ -16,19 +16,19 @@ void main()
 {
 	// Color (calculated from RGBa)
 	vec3 color = vec3(
-			baseColorFactor[0],
-			baseColorFactor[1],
-			baseColorFactor[2]
+	baseColorFactor[0],
+	baseColorFactor[1],
+	baseColorFactor[2]
 	);
 
 	// Lighting
 	vec3  lightDir  = lightPosition - worldPosition;
 	float lightDist = dot(lightDir, lightDir);
 
-	float cosTheta  = clamp(dot(normalize(lightDir), worldNormal), 0.0, 1.0);
+	float cosTheta  = abs(dot(normalize(lightDir), worldNormal));
 	vec3 light = lightIntensity / (4*3.14*lightDist);
 
-	vec3 v = color * light * cosTheta;
+	vec3 v = (1.14/3.14)* color * light * cosTheta;
 
 	// Tone mapping
 	v = v / (1.0 + v);
@@ -37,5 +37,5 @@ void main()
 	v = pow(v, vec3(1.0 / 2.2));
 
 	// Gamma correction
-	finalColor = color;
+	finalColor = v;
 }

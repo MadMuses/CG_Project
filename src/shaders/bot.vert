@@ -12,6 +12,7 @@ layout(location = 4) in vec4 j_weights;
 out vec3 worldPosition;
 out vec3 worldNormal;
 
+// View matrices
 uniform mat4 MVP;
 
 // vector containing all of the joint matrices
@@ -27,15 +28,15 @@ void main() {
 
     // Calculate the skin matrix :
     mat4 skinMat =
-          jointMatricesVec[int(j_IDs.x)]* normweights.x
-        + jointMatricesVec[int(j_IDs.y)]* normweights.y
-        + jointMatricesVec[int(j_IDs.z)]* normweights.z
-        + jointMatricesVec[int(j_IDs.w)]* normweights.w;
+    jointMatricesVec[int(j_IDs.x)]* normweights.x
+    + jointMatricesVec[int(j_IDs.y)]* normweights.y
+    + jointMatricesVec[int(j_IDs.z)]* normweights.z
+    + jointMatricesVec[int(j_IDs.w)]* normweights.w;
 
     mat4 skinMatNormal = transpose(inverse(skinMat));
 
     // World-space geometry
-    worldPosition = (MVP * skinMat * vec4(vertexPosition,1)).xyz;
+    worldPosition = (skinMat * vec4(vertexPosition,1)).xyz;
     worldNormal = normalize(skinMatNormal * vec4(vertexNormal, 0.0)).xyz;
 
     // Transform vertex
