@@ -65,3 +65,21 @@ GLuint LoadTextureTileBox(const char *texture_file_path) {
 
     return texture;
 }
+
+std::map<std::string,GLuint> LoadShaders()
+{
+    std::map<std::string,GLuint> shaderlist;
+
+    GLuint programID = LoadShadersFromFile("../src/shaders/bot.vert", "../src/shaders/bot.frag");
+    GLuint domeShaderID = LoadShadersFromFile("../src/shaders/dome.vert", "../src/shaders/dome.frag");
+
+    if (programID == 0 || domeShaderID == 0)
+    {
+        std::cerr << "Failed to load shaders." << std::endl;
+    }
+
+    shaderlist["bot"] = programID;
+    shaderlist["dome"] = domeShaderID;
+
+    return shaderlist;
+}
