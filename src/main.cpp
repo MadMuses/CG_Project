@@ -77,8 +77,11 @@ int main(void)
     staticObj dome;
     dome.initialize(programID,0,"../assets/models/dome/dome.gltf", glm::vec3(0.0f),glm::vec3(100.0f));
 
+    staticObj domeBase;
+    domeBase.initialize(programID,1,"../assets/models/dome/base.gltf",glm::vec3(0.0f),glm::vec3(120.0f));
+
     myBot bot;
-    bot.initialize(programID,1,"../assets/models/bot/bot.gltf");
+    bot.initialize(programID,2,"../assets/models/bot/bot.gltf");
 
     Skybox skybox;
     skybox.initialize(glm::vec3(1000.f));
@@ -110,6 +113,7 @@ int main(void)
 
         bot.render(vp,lightPosition,lightIntensity);
         dome.render(vp,lightPosition,lightIntensity);
+        domeBase.render(vp,eye_center,lightIntensity);
 
         // FPS tracking
         // Count number of frames over a few seconds and take average
