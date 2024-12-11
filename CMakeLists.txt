@@ -25,6 +25,7 @@ add_executable(main
 	src/objects/obj/staticObj.cpp
 	src/objects/bot/myBot.cpp
 	src/objects/skybox/skybox.cpp
+	src/objects/cube/cube.cpp
 )
 target_link_libraries(main
 	${OPENGL_LIBRARY}
