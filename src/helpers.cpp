@@ -70,16 +70,13 @@ std::map<std::string,GLuint> LoadShaders()
 {
     std::map<std::string,GLuint> shaderlist;
 
-    GLuint programID = LoadShadersFromFile("../src/shaders/bot.vert", "../src/shaders/bot.frag");
-    GLuint domeShaderID = LoadShadersFromFile("../src/shaders/dome.vert", "../src/shaders/dome.frag");
+    GLuint programID = LoadShadersFromFile("../src/shaders/obj.vert", "../src/shaders/obj.frag");
 
-    if (programID == 0 || domeShaderID == 0)
+    if (programID == 0)
     {
         std::cerr << "Failed to load shaders." << std::endl;
     }
-
-    shaderlist["bot"] = programID;
-    shaderlist["dome"] = domeShaderID;
+    shaderlist["objBasic"] = programID;
 
     return shaderlist;
 }

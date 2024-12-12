@@ -28,13 +28,13 @@ int main(void)
     // initializing objects
     lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(worldScale*100));
-    dome.initialize(shaders["dome"],0,"../assets/models/dome/dome.gltf",
+    dome.initialize(shaders["objBasic"],0,"../assets/models/dome/dome.gltf",
         glm::vec3(0.0f),
         glm::vec3(domeScale * worldScale),
         glm::vec3(0.0f,1.0f,0.0f),
         0.0f);
 
-    bot.initialize(shaders["bot"],1,"../assets/models/bot/bot.gltf");
+    bot.initialize(shaders["objBasic"],1,"../assets/models/bot/bot.gltf");
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
