@@ -1,11 +1,11 @@
 #include <tiny_gltf.h>
 #include "movingObj.h"
 
-void movingObj::initialize(GLuint programID, int blockBindID,const char *filename,
+void movingObj::initialize(GLuint programID, int blockBindID,const char *filename, const char *texturePath,
 		glm::vec3 position, glm::vec3 scale,glm::vec3 rotationAxis,GLfloat rotationAngle)
 {
 
-	staticObj::initialize(programID, blockBindID,filename,position,scale,rotationAxis,rotationAngle);
+	staticObj::initialize(programID, blockBindID,filename,texturePath,position,scale,rotationAxis,rotationAngle);
 
 	// Prepare animation data
 	animationObjects = prepareAnimation(model);

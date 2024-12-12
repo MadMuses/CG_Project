@@ -17,7 +17,7 @@
 struct movingObj : public staticObj {
 
     // changing the initialise to setup the animation
-    void initialize(GLuint programID, int blockBindID,const char *filename,
+    void initialize(GLuint programID, int blockBindID,const char *filename,const char *texturePath = NULL,
         glm::vec3 position = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f),glm::vec3 rotationAxis = glm::vec3(0.0f),GLfloat rotationAngle = 0.0f) override;
 
     // Helper

@@ -343,7 +343,7 @@ void staticObj::drawModel(const std::vector<PrimitiveObject>& primitiveObjects,
 	}
 }
 
-void staticObj::initialize(GLuint programID, int blockBindID, const char *filename,
+void staticObj::initialize(GLuint programID, int blockBindID, const char *filename, const char *texturePath,
 	glm::vec3 position, glm::vec3 scale, glm::vec3 rotationAxis,GLfloat rotationAngle) {
 
 	// Basic transforms
@@ -379,6 +379,16 @@ void staticObj::initialize(GLuint programID, int blockBindID, const char *filena
 	metallicUniID = glGetUniformLocation(programID, "metallicFactor");
 	roughnessUniID = glGetUniformLocation(programID, "roughnessFactor");
 
+	// Handling textures
+	if (texturePath == NULL){
+		this -> validTexture = 0.0f;
+	}else{
+		textureID = LoadTextureTileBox(texturePath);
+		textureSamplerID  = glGetUniformLocation(programID,"textureSampler");
+		this -> validTexture = 1.0f;
+	}
+	validTextureTestID = glGetUniformLocation(programID, "validTexture");
+
 	// Generate what's necessary for the passage of the jointMatrices to the shader
 	// NB : To make it more adaptable, we'll need to pass the size of the vector as another uniform to the shader
 /*
@@ -395,6 +405,7 @@ void staticObj::initialize(GLuint programID, int blockBindID, const char *filena
 	ubo_jointMatricesID = glGetUniformBlockIndex(programID, "jointMatrices");
 	glUniformBlockBinding(programID, ubo_jointMatricesID, blockBindID);  // 0 est le binding point du UBO
 	glBindBufferBase(GL_UNIFORM_BUFFER, blockBindID, jointMatricesID);
+
 }
 
 void staticObj::render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity) {
@@ -435,6 +446,15 @@ void staticObj::render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 
 	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0,skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data());
 	// -----------------------------------------------------------------
+
+	// Handling texture
+
+	// Send texture through sampler
+	glActiveTexture(GL_TEXTURE0 + blockBindID + 10);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glUniform1i(textureSamplerID, blockBindID + 10);
+
+	glUniform1fv(validTextureTestID,1,&validTexture);
 
 	// Set light data
 	glUniform3fv(lightPositionID, 1, &lightPosition[0]);

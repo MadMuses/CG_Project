@@ -3,9 +3,9 @@
 #include <glm/gtx/string_cast.hpp>
 #include <vector>
 
-
 // Other relevant structs
 #include "../commonStructs.h"
+#include "helpers.h"
 
 #ifndef STATICOBJ_H
 #define STATICOBJ_H
@@ -19,7 +19,7 @@ struct staticObj {
     // Methods
 
     // Base use fonctions used outside struct
-    virtual void initialize(GLuint programID, int blockBindID,const char *filename,
+    virtual void initialize(GLuint programID, int blockBindID,const char *filename, const char *texturePath = NULL,
         glm::vec3 position = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f),glm::vec3 rotationAxis = glm::vec3(0.0f),GLfloat rotationAngle = 0.0f);
     void render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity);
     void cleanup();
@@ -68,6 +68,12 @@ struct staticObj {
     GLuint materialUniID;
     GLuint metallicUniID;
     GLuint roughnessUniID;
+
+    // Texture handling
+    GLuint textureID;
+    GLuint textureSamplerID;
+    GLuint validTextureTestID;
+    GLfloat validTexture;
 
     // Model related variables
     tinygltf::Model model;

@@ -3,6 +3,9 @@
 in vec3 worldPosition;
 in vec3 worldNormal;	// normalised in vertex shader
 
+// Texture related
+in vec2 textureUV;
+
 out vec3 finalColor;
 
 uniform vec3 lightPosition;
@@ -12,14 +15,18 @@ uniform vec4  baseColorFactor;
 uniform float metallicFactor;
 uniform float roughnessFactor;
 
+uniform sampler2D textureSampler;
+uniform float validTexture;			// If valid texture is 0.0f, there is no texture, if not there is one
+
 void main()
 {
-	// Color (calculated from RGBa)
-	vec3 color = vec3(
-	baseColorFactor[0],
-	baseColorFactor[1],
-	baseColorFactor[2]
-	);
+	vec3 color;
+	if (validTexture == 1.0f){
+		color = texture(textureSampler,textureUV).rgb;
+	}else{
+		// Color (calculated from RGBa)
+		color = vec3(baseColorFactor[0], baseColorFactor[1], baseColorFactor[2]);
+	}
 
 	// Lighting
 	vec3  lightDir  = lightPosition - worldPosition;

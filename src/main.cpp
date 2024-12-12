@@ -21,18 +21,27 @@ int main(void)
 
     // Our 3D character
     Skybox skybox;
-    staticObj dome;
     Cube lightcube;
+
+    staticObj dome;
+    staticObj virgo;
+
     movingObj bot;
+
 
     // initializing objects
     lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(worldScale*100));
-    dome.initialize(shaders["objBasic"],0,"../assets/models/dome/dome.gltf",
+
+    dome.initialize(shaders["objBasic"],0,"../assets/models/dome/dome.gltf", NULL,
         glm::vec3(0.0f),
         glm::vec3(domeScale * worldScale),
         glm::vec3(0.0f,1.0f,0.0f),
         0.0f);
+
+    virgo.initialize(shaders["objBasic"],2,"../assets/models/ships/virgo.gltf", "../assets/textures/ships/virgo.png",
+        glm::vec3(200.0f,0.0f,200.0f),
+        glm::vec3(worldScale*5));
 
     bot.initialize(shaders["objBasic"],1,"../assets/models/bot/bot.gltf");
 
@@ -57,6 +66,8 @@ int main(void)
         lightcube.render(vp,lightPosition);
         bot.render(vp,lightPosition,lightIntensity);
         dome.render(vp,lightPosition,lightIntensity);
+
+        virgo.render(vp,lightPosition,lightIntensity);
 
         // Count number of frames over a few seconds and take average
         calcframerate();

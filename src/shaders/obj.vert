@@ -11,6 +11,7 @@ layout(location = 4) in vec4 j_weights;
 // Output data, to be interpolated for each fragment
 out vec3 worldPosition;
 out vec3 worldNormal;
+out vec2 textureUV;
 
 // View matrices
 uniform mat4 MVP;
@@ -21,6 +22,8 @@ layout(std140) uniform jointMatrices {
 };
 
 void main() {
+    // Textures
+    textureUV = vertexUV;
 
     // normalising the weights in case
     float total_weight = j_weights.x + j_weights.y + j_weights.z + j_weights.w;
