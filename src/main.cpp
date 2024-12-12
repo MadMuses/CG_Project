@@ -23,6 +23,7 @@ int main(void)
     Skybox skybox;
     staticObj dome;
     Cube lightcube;
+    movingObj bot;
 
     // initializing objects
     lightcube.initialize(lightPosition);
@@ -32,6 +33,8 @@ int main(void)
         glm::vec3(domeScale * worldScale),
         glm::vec3(0.0f,1.0f,0.0f),
         0.0f);
+
+    bot.initialize(shaders["bot"],1,"../assets/models/bot/bot.gltf");
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -52,7 +55,7 @@ int main(void)
 
         skybox.render(vp);
         lightcube.render(vp,lightPosition);
-
+        bot.render(vp,lightPosition,lightIntensity);
         dome.render(vp,lightPosition,lightIntensity);
 
         // Count number of frames over a few seconds and take average
@@ -60,6 +63,7 @@ int main(void)
 
         if (playAnimation) {
             thetime += deltaTime * playbackSpeed;
+            bot.update(thetime);
         }
 
         // Swap buffers

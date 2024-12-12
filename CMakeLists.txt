@@ -22,8 +22,10 @@ add_executable(main
 	src/render/shader.cpp
 	src/main.cpp
 	src/helpers.cpp
+
 	src/objects/obj/staticObj.cpp
-	src/objects/bot/myBot.cpp
+	src/objects/obj/movingObj.cpp
+
 	src/objects/skybox/skybox.cpp
 	src/objects/cube/cube.cpp
 )

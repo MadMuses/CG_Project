@@ -26,10 +26,11 @@
 #include "helpers.h"
 
 // Objects include
-#include "objects/obj/staticObj.h"
-#include "objects/bot/myBot.h"
 #include "objects/skybox/skybox.h"
 #include "objects/cube/cube.h"
+
+#include "objects/obj/staticObj.h"
+#include "objects/obj/movingObj.h"
 
 // Static elements
 static GLFWwindow *window;
