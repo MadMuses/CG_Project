@@ -11,7 +11,7 @@ int main(void)
     glfwSetKeyCallback(window, key_callback);
 
     // Background
-    glClearColor(0.2f, 0.2f, 0.2f, 0.f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.f);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -20,15 +20,18 @@ int main(void)
     shaders = LoadShaders();
 
     // Our 3D character
-    staticObj dome;
-    dome.initialize(shaders["dome"],0,"../assets/models/dome/dome.gltf", glm::vec3(0.0f,-20.0f,0.0f),glm::vec3(100.0f));
-
     Skybox skybox;
-    skybox.initialize(glm::vec3(1000.f));
-
+    staticObj dome;
     Cube lightcube;
-    lightcube.initialize(lightPosition);
 
+    // initializing objects
+    lightcube.initialize(lightPosition);
+    skybox.initialize(glm::vec3(worldScale*100));
+    dome.initialize(shaders["dome"],0,"../assets/models/dome/dome.gltf",
+        glm::vec3(0.0f),
+        glm::vec3(domeScale * worldScale),
+        glm::vec3(0.0f,1.0f,0.0f),
+        0.0f);
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -52,7 +55,6 @@ int main(void)
 
         dome.render(vp,lightPosition,lightIntensity);
 
-
         // Count number of frames over a few seconds and take average
         calcframerate();
 
@@ -68,6 +70,9 @@ int main(void)
     while (!glfwWindowShouldClose(window));
 
     // Clean up
+    skybox.cleanup();
+    dome.cleanup();
+    lightcube.cleanup();
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
