@@ -343,7 +343,7 @@ void staticObj::drawModel(const std::vector<PrimitiveObject>& primitiveObjects,
 	}
 }
 
-void staticObj::initialize(GLuint programID, int blockBindID, const char *filename, const char *texturePath,
+void staticObj::initialize(GLuint programID, GLuint depthProgramID, int blockBindID, const char *filename, const char *texturePath,
 	glm::vec3 position, glm::vec3 scale, glm::vec3 rotationAxis,GLfloat rotationAngle) {
 
 	// Basic transforms
@@ -368,6 +368,7 @@ void staticObj::initialize(GLuint programID, int blockBindID, const char *filena
 
 	// Get shader program
 	this -> programID = programID;
+	this -> depthProgramID = depthProgramID;
 	this -> blockBindID = blockBindID;
 
 	// Get a handle for GLSL variables
@@ -420,7 +421,6 @@ void staticObj::render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 
 	// Scale the box along each axis
 	modelMatrix = glm::scale(modelMatrix, scale);
 
-
 	// Rotate the box along the chosen axis
 	if (rotationAngle != 0) {
 		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotationAngle), rotationAxis);
@@ -459,6 +459,39 @@ void staticObj::render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 
 	// Set light data
 	glUniform3fv(lightPositionID, 1, &lightPosition[0]);
 	glUniform3fv(lightIntensityID, 1, &lightIntensity[0]);
+
+	// Draw the GLTF model
+	drawModel(primitiveObjects, model);
+}
+
+void staticObj::depthRender(glm::mat4 lightViewMatrix) {
+	glUseProgram(depthProgramID);
+
+	// Set transforms
+	glm::mat4 modelMatrix = glm::mat4();
+
+	// Translate the box to its position
+	modelMatrix = glm::translate(modelMatrix, position);
+
+	// Scale the box along each axis
+	modelMatrix = glm::scale(modelMatrix, scale);
+
+	// Rotate the box along the chosen axis
+	if (rotationAngle != 0) {
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotationAngle), rotationAxis);
+	}
+
+	// Set camera
+	glm::mat4 mvp = lightViewMatrix*modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(depthProgramID, "MVP"), 1, GL_FALSE, &mvp[0][0]);
+
+	// Use the relevant blockBind buffer
+	glUniformBlockBinding(depthProgramID, glGetUniformBlockIndex(depthProgramID, "jointMatrices"), blockBindID);  // 0 est le binding point du UBO
+	glBindBufferBase(GL_UNIFORM_BUFFER, blockBindID, jointMatricesID);
+
+	// Get the data into the buffer for access in the shaders
+	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0,skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data());
 
 	// Draw the GLTF model
 	drawModel(primitiveObjects, model);
