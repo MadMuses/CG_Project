@@ -19,7 +19,10 @@ int main(void)
     // Load shaders
     shaders = LoadShaders();
 
-    // Our 3D character
+    // Create depth FBO and Texture
+    LoadFBO(depthFBO,depthTexture,depthMapWidth,depthMapHeight);
+
+    // All of our models
     Skybox skybox;
     Cube lightcube;
 
@@ -56,6 +59,10 @@ int main(void)
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
     projectionMatrix = glm::perspective(glm::radians(FoV), (float)windowWidth / windowHeight, zNear, zFar);
+
+    // Light POV Camera setup
+    glm::mat4 lightViewMatrix, lightProjectionMatrix;
+    lightProjectionMatrix = glm::perspective(glm::radians(depthFoV), (float)depthMapWidth / depthMapHeight, depthNear, depthFar);
 
     do
     {

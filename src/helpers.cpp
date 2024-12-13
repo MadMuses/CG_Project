@@ -80,3 +80,31 @@ std::map<std::string,GLuint> LoadShaders()
 
     return shaderlist;
 }
+
+void LoadFBO(GLuint frameBufferID, GLuint depthTexture,int depthMapWidth, int depthMapHeight)
+{
+    // Create a frame buffer
+    glGenFramebuffers(1, &frameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+
+    // Create Framebuffer Texture
+    glGenTextures(1, &depthTexture);
+    glBindTexture(GL_TEXTURE_2D, depthTexture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, depthMapWidth, depthMapHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // Prevents edge bleeding
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Prevents edge bleeding
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cerr << "Framebuffer is not complete." << std::endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

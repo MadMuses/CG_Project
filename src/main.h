@@ -50,8 +50,23 @@ static float zNear = 10.0f;
 static float zFar = 3000.0f;
 
 // Lighting
-static glm::vec3 lightIntensity(1e6f);
+static glm::vec3 lightIntensity(0.25e6f);
 static glm::vec3 lightPosition(0.0, 1.1f * worldScale * domeScale, 0.0f);
+
+// Shadow mapping
+static glm::vec3 lightUp(1, 0, 0);
+static int depthMapWidth = 1024;
+static int depthMapHeight = 758;
+
+// Depth camera settings
+static glm::vec3 depthlookat(0.0f, 0.0f, 0.0f);
+static float depthFoV = 90.0f;
+static float depthNear = 10.0f;
+static float depthFar = 200.0f;
+
+// Frame buffer stuff
+GLuint depthFBO;
+GLuint depthTexture;
 
 // Animation
 static bool playAnimation = true;
@@ -112,12 +127,13 @@ void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float w
 {
     std::string names[4] = {"grass_2","grass_3","grass_4.1","grass_4.2"};
     std::string treenames[2] = {"spruce","oak"};
+    glm::vec3 treepositions[2] = {glm::vec3(20.0f,0.0f,80.0f),glm::vec3(60.0f,0.0f,-40.0f)};
 
     for (int i = 0; i < 4; ++i)
     {
         std::string modelPath = "../assets/models/nature/" + names[i] + ".gltf";
         plants[i].initialize(shaders["objBasic"],i + blockBindFloor,modelPath.c_str(), NULL,
-        glm::vec3(0.0f,0.0f,0.0f),
+        glm::vec3(40.0f,0.0f,-60.0f + 30.0f*i),
         glm::vec3(worldScale*0.5));
     }
 
@@ -130,10 +146,37 @@ void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float w
         std::string treemodelPath = "../assets/models/nature/" + treenames[j-5] + ".gltf";
 
         plants[j].initialize(shaders["objBasic"],j + blockBindFloor,treemodelPath.c_str(), "../assets/textures/nature/trees.png",
-        glm::vec3(0.0f),
+        treepositions[j-5],
         glm::vec3(worldScale*2.5));
     }
 
+}
+
+static void saveDepthTexture(GLuint fbo, std::string filename) {
+    int width = depthMapWidth;
+    int height = depthMapHeight;
+    if (depthMapWidth == 0 || depthMapHeight == 0) {
+        width = windowWidth;
+        height = windowHeight;
+    }
+    int channels = 3;
+
+    std::vector<float> depth(width * height);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glReadBuffer(GL_DEPTH_COMPONENT);
+    glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth.data());
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    std::vector<unsigned char> img(width * height * 3);
+    for (int i = 0; i < width * height; ++i) img[3*i] = img[3*i+1] = img[3*i+2] = depth[i] * 255;
+    std::ofstream file_out("depthData.txt");
+    for (int i = 0; i < width * height; ++i)
+    {
+        file_out << depth[i] << " ";
+        if (i % width == width - 1) file_out << "\n";
+    }
+
+    stbi_write_png(filename.c_str(), width, height, channels, img.data(), width * channels);
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
