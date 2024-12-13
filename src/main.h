@@ -92,6 +92,50 @@ void calcframerate()
     }
 };
 
+void prepShips(std::map<std::string,GLuint> shaders, staticObj ships[3],float worldScale)
+{
+    std::string names[3] = {"virgo","scorpio","gemini"};
+    float scales[3] = {8.0f,6.0f,5.0f};
+
+    for (int i = 0; i < 3; ++i)
+    {
+        std::string modelPath = "../assets/models/ships/" + names[i] + ".gltf";
+        std::string texturePath = "../assets/textures/ships/" + names[i] + ".png";
+
+        ships[i].initialize(shaders["objBasic"],i,modelPath.c_str(), texturePath.c_str(),
+        glm::vec3(300.0f,0.0f,-300.0f + 300.0f*i),
+        glm::vec3(worldScale*scales[i]));
+    }
+}
+
+void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float worldScale, int blockBindFloor)
+{
+    std::string names[4] = {"grass_2","grass_3","grass_4.1","grass_4.2"};
+    std::string treenames[2] = {"spruce","oak"};
+
+    for (int i = 0; i < 4; ++i)
+    {
+        std::string modelPath = "../assets/models/nature/" + names[i] + ".gltf";
+        plants[i].initialize(shaders["objBasic"],i + blockBindFloor,modelPath.c_str(), NULL,
+        glm::vec3(0.0f,0.0f,0.0f),
+        glm::vec3(worldScale*0.5));
+    }
+
+    plants[4].initialize(shaders["objBasic"],4+blockBindFloor,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png",
+    glm::vec3(50.0f,0.0f,0.0f),
+    glm::vec3(worldScale*0.5));
+
+    for (int j = 5; j < 7; ++j)
+    {
+        std::string treemodelPath = "../assets/models/nature/" + treenames[j-5] + ".gltf";
+
+        plants[j].initialize(shaders["objBasic"],j + blockBindFloor,treemodelPath.c_str(), "../assets/textures/nature/trees.png",
+        glm::vec3(0.0f),
+        glm::vec3(worldScale*2.5));
+    }
+
+}
+
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
 {
     if (action == GLFW_REPEAT || action == GLFW_PRESS)

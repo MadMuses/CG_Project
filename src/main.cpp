@@ -24,26 +24,34 @@ int main(void)
     Cube lightcube;
 
     staticObj dome;
+
     staticObj virgo;
+    staticObj gemini;
+    staticObj scorpio;
 
-    movingObj bot;
+    staticObj grass2;
+    staticObj grass3;
+    staticObj grass41;
+    staticObj grass42;
+    staticObj flower;
+    staticObj spruce;
+    staticObj oak;
 
+    staticObj ships[3] = {virgo,gemini,scorpio};
+    prepShips(shaders,ships,worldScale);
+
+    staticObj plants[7] = {grass2,grass3,grass41,grass42,flower,spruce,oak};
+    prepNature(shaders,plants,worldScale,5);
 
     // initializing objects
     lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(worldScale*100));
 
-    dome.initialize(shaders["objBasic"],0,"../assets/models/dome/dome.gltf", NULL,
+    dome.initialize(shaders["objBasic"],30,"../assets/models/dome/dome.gltf", NULL,
         glm::vec3(0.0f),
         glm::vec3(domeScale * worldScale),
         glm::vec3(0.0f,1.0f,0.0f),
         0.0f);
-
-    virgo.initialize(shaders["objBasic"],2,"../assets/models/ships/virgo.gltf", "../assets/textures/ships/virgo.png",
-        glm::vec3(200.0f,0.0f,200.0f),
-        glm::vec3(worldScale*5));
-
-    bot.initialize(shaders["objBasic"],1,"../assets/models/bot/bot.gltf");
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -64,17 +72,23 @@ int main(void)
 
         skybox.render(vp);
         lightcube.render(vp,lightPosition);
-        bot.render(vp,lightPosition,lightIntensity);
+
         dome.render(vp,lightPosition,lightIntensity);
 
-        virgo.render(vp,lightPosition,lightIntensity);
+        for (int i=0; i < 3;i++)
+        {
+            ships[i].render(vp,lightPosition,lightIntensity);
+        }
+        for (int i=0; i < 7;i++)
+        {
+            plants[i].render(vp,lightPosition,lightIntensity);
+        }
 
         // Count number of frames over a few seconds and take average
         calcframerate();
 
         if (playAnimation) {
             thetime += deltaTime * playbackSpeed;
-            bot.update(thetime);
         }
 
         // Swap buffers
