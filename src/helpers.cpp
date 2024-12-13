@@ -71,12 +71,14 @@ std::map<std::string,GLuint> LoadShaders()
     std::map<std::string,GLuint> shaderlist;
 
     GLuint programID = LoadShadersFromFile("../src/shaders/obj.vert", "../src/shaders/obj.frag");
+    GLuint depthProgramID = LoadShadersFromFile("../src/shaders/depth.vert", "../src/shaders/depth.frag");
 
-    if (programID == 0)
+    if (programID == 0 || depthProgramID == 0)
     {
         std::cerr << "Failed to load shaders." << std::endl;
     }
     shaderlist["objBasic"] = programID;
+    shaderlist["objDepth"] = depthProgramID;
 
     return shaderlist;
 }

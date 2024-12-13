@@ -50,7 +50,7 @@ int main(void)
     lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(worldScale*100));
 
-    dome.initialize(shaders["objBasic"],30,"../assets/models/dome/dome.gltf", NULL,
+    dome.initialize(shaders["objBasic"],shaders["objDepth"],30,"../assets/models/dome/dome.gltf", NULL,
         glm::vec3(0.0f),
         glm::vec3(domeScale * worldScale),
         glm::vec3(0.0f,1.0f,0.0f),
