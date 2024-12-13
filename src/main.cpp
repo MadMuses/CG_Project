@@ -28,17 +28,8 @@ int main(void)
 
     staticObj dome;
 
-    staticObj virgo;
-    staticObj gemini;
-    staticObj scorpio;
-
-    staticObj grass2;
-    staticObj grass3;
-    staticObj grass41;
-    staticObj grass42;
-    staticObj flower;
-    staticObj spruce;
-    staticObj oak;
+    staticObj virgo,gemini,scorpio;
+    staticObj grass2,grass3,grass41,grass42,flower,spruce,oak;
 
     staticObj ships[3] = {virgo,gemini,scorpio};
     prepShips(shaders,ships,worldScale);
@@ -64,8 +55,31 @@ int main(void)
     glm::mat4 lightViewMatrix, lightProjectionMatrix;
     lightProjectionMatrix = glm::perspective(glm::radians(depthFoV), (float)depthMapWidth / depthMapHeight, depthNear, depthFar);
 
+    bool saveDepth = true;
     do
     {
+    // Managing the depth texture creation
+        glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        lightViewMatrix = glm::lookAt(lightPosition,depthlookat,lightUp);
+        glm::mat4 lvp = lightProjectionMatrix * lightViewMatrix;
+
+        dome.depthRender(lvp);
+        for (int i=0; i < 7;i++)
+        {
+            plants[i].depthRender(lvp);
+        }
+
+        if (saveDepth) {
+            std::string filename = "depth_camera.png";
+            saveDepthTexture(depthFBO, filename);
+            std::cout << "Depth texture saved to " << filename << std::endl;
+            saveDepth = false;
+        }
+
+    // Rendering the scene
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Update states for animation

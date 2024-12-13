@@ -61,8 +61,8 @@ static int depthMapHeight = 758;
 // Depth camera settings
 static glm::vec3 depthlookat(0.0f, 0.0f, 0.0f);
 static float depthFoV = 90.0f;
-static float depthNear = 10.0f;
-static float depthFar = 200.0f;
+static float depthNear = 90.0f;
+static float depthFar = 350.0f;
 
 // Frame buffer stuff
 GLuint depthFBO;
