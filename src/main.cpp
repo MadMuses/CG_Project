@@ -102,6 +102,8 @@ int main(void)
     skybox.cleanup();
     dome.cleanup();
     lightcube.cleanup();
+    for (int i=0; i < 3;i++){ships[i].cleanup();}
+    for (int i=0; i < 7;i++){plants[i].cleanup();}
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
