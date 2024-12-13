@@ -18,12 +18,15 @@ struct staticObj {
 
     // Methods
 
-    // Base use fonctions used outside struct
+    // Base use fonctions
     virtual void initialize(GLuint programID,GLuint depthProgramID, int blockBindID,const char *filename, const char *texturePath = NULL,
         glm::vec3 position = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f),glm::vec3 rotationAxis = glm::vec3(0.0f),GLfloat rotationAngle = 0.0f);
-    void render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity);
-    void depthRender(glm::mat4 lightViewMatrix);
     void cleanup();
+
+    // Render methods
+    void render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity);
+    void s_render(glm::mat4 cameraMatrix, glm::mat4 lightMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity,GLuint depthTexture);
+    void depthRender(glm::mat4 lightViewMatrix);
 
     // Nodes computations
     glm::mat4 getNodeTransform(const tinygltf::Node& node);
@@ -67,6 +70,10 @@ struct staticObj {
     // Shader programs
     GLuint programID;
     GLuint depthProgramID;
+
+    // Shadow manipulations
+    GLuint lvpMatrixID;
+    GLuint depthTextureSamplerID;
 
     // Material uniform handler idea
     GLuint materialUniID;

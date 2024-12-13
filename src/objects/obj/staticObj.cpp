@@ -373,12 +373,16 @@ void staticObj::initialize(GLuint programID, GLuint depthProgramID, int blockBin
 
 	// Get a handle for GLSL variables
 	mvpMatrixID = glGetUniformLocation(programID, "MVP");
+	lvpMatrixID = glGetUniformLocation(programID, "LVP");
 	lightPositionID = glGetUniformLocation(programID, "lightPosition");
 	lightIntensityID = glGetUniformLocation(programID, "lightIntensity");
 
 	materialUniID = glGetUniformLocation(programID, "baseColorFactor");
 	metallicUniID = glGetUniformLocation(programID, "metallicFactor");
 	roughnessUniID = glGetUniformLocation(programID, "roughnessFactor");
+
+	// Depth texture
+	depthTextureSamplerID  = glGetUniformLocation(programID,"depthTextureSampler");
 
 	// Handling textures
 	if (texturePath == NULL){
@@ -391,13 +395,6 @@ void staticObj::initialize(GLuint programID, GLuint depthProgramID, int blockBin
 	validTextureTestID = glGetUniformLocation(programID, "validTexture");
 
 	// Generate what's necessary for the passage of the jointMatrices to the shader
-	// NB : To make it more adaptable, we'll need to pass the size of the vector as another uniform to the shader
-/*
-	howManyJointsID = glGetUniformLocation(programID, "howManyJoints");
-	int thatManyJoints = skinObjects[0].jointMatrices.size();
-	std::cout << std::endl << thatManyJoints << std::endl;
-	glUniform1iv(howManyJointsID, 1, &thatManyJoints);
-*/
 	glGenBuffers(1, &jointMatricesID);
 	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
 	glBufferData(GL_UNIFORM_BUFFER, skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data(), GL_DYNAMIC_DRAW);
@@ -430,14 +427,6 @@ void staticObj::render(glm::mat4 cameraMatrix,glm::vec3 lightPosition,glm::vec3 
 	glm::mat4 mvp = cameraMatrix*modelMatrix;
 	glUniformMatrix4fv(mvpMatrixID, 1, GL_FALSE, &mvp[0][0]);
 
-	// -----------------------------------------------------------------
-	// TODO: Set animation data for linear blend skinning in shader
-	// -----------------------------------------------------------------
-/*
-	int thatManyJoints = skinObjects[0].jointMatrices.size();
-	std::cout << std::endl << thatManyJoints << std::endl;
-	glUniform1iv(howManyJointsID, 1, &thatManyJoints);
-*/
 	// Use the relevant blockBind buffer
 	glUniformBlockBinding(programID, ubo_jointMatricesID, blockBindID);  // 0 est le binding point du UBO
 	glBindBufferBase(GL_UNIFORM_BUFFER, blockBindID, jointMatricesID);
@@ -492,6 +481,63 @@ void staticObj::depthRender(glm::mat4 lightViewMatrix) {
 	// Get the data into the buffer for access in the shaders
 	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0,skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data());
+
+	// Draw the GLTF model
+	drawModel(primitiveObjects, model);
+}
+
+void staticObj::s_render(glm::mat4 cameraMatrix, glm::mat4 lightMatrix,glm::vec3 lightPosition,glm::vec3 lightIntensity,GLuint depthTexture)
+{
+	glUseProgram(programID);
+
+	// Set transforms
+	glm::mat4 modelMatrix = glm::mat4();
+
+	// Translate the box to its position
+	modelMatrix = glm::translate(modelMatrix, position);
+
+	// Scale the box along each axis
+	modelMatrix = glm::scale(modelMatrix, scale);
+
+	// Rotate the box along the chosen axis
+	if (rotationAngle != 0) {
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotationAngle), rotationAxis);
+	}
+
+	// Set camera
+	glm::mat4 mvp = cameraMatrix*modelMatrix;
+	glUniformMatrix4fv(mvpMatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+	// Set light
+	glm::mat4 lvp = lightMatrix*modelMatrix;
+	glUniformMatrix4fv(lvpMatrixID, 1, GL_FALSE, &lvp[0][0]);
+
+	// Use the relevant blockBind buffer
+	glUniformBlockBinding(programID, ubo_jointMatricesID, blockBindID);  // 0 est le binding point du UBO
+	glBindBufferBase(GL_UNIFORM_BUFFER, blockBindID, jointMatricesID);
+
+	// Get the data into the buffer for access in the shaders
+	glBindBuffer(GL_UNIFORM_BUFFER, jointMatricesID);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0,skinObjects[0].jointMatrices.size() * sizeof(glm::mat4), skinObjects[0].jointMatrices.data());
+	// -----------------------------------------------------------------
+
+	// Handling texture
+
+	// Set depthBuffer Texture data
+	glActiveTexture(GL_TEXTURE0+7);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glUniform1i(depthTextureSamplerID, 7);
+
+	// Send texture through sampler
+	glActiveTexture(GL_TEXTURE0 + blockBindID + 10);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glUniform1i(textureSamplerID, blockBindID + 10);
+
+	glUniform1fv(validTextureTestID,1,&validTexture);
+
+	// Set light data
+	glUniform3fv(lightPositionID, 1, &lightPosition[0]);
+	glUniform3fv(lightIntensityID, 1, &lightIntensity[0]);
 
 	// Draw the GLTF model
 	drawModel(primitiveObjects, model);
