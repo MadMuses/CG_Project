@@ -12,9 +12,11 @@ layout(location = 4) in vec4 j_weights;
 out vec3 worldPosition;
 out vec3 worldNormal;
 out vec2 textureUV;
+out vec4 projectedPosition;
 
 // View matrices
 uniform mat4 MVP;
+uniform mat4 LVP;
 
 // vector containing all of the joint matrices
 layout(std140) uniform jointMatrices {
@@ -40,8 +42,9 @@ void main() {
 
     // World-space geometry
     worldPosition = (skinMat * vec4(vertexPosition,1)).xyz;
-    worldNormal = normalize(skinMatNormal * vec4(vertexNormal, 0.0)).xyz;
+    worldNormal = normalize((skinMatNormal * vec4(vertexNormal, 0.0)).xyz);
 
     // Transform vertex
     gl_Position =  MVP * skinMat * vec4(vertexPosition,1);
+    projectedPosition = LVP * skinMat * vec4(vertexPosition,1.0f);
 }

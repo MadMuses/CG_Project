@@ -1,22 +1,26 @@
 #version 330 core
+out vec3 finalColor;
 
 in vec3 worldPosition;
 in vec3 worldNormal;	// normalised in vertex shader
 
-// Texture related
-in vec2 textureUV;
-
-out vec3 finalColor;
-
 uniform vec3 lightPosition;
 uniform vec3 lightIntensity;
 
+// Color related
 uniform vec4  baseColorFactor;
 uniform float metallicFactor;
 uniform float roughnessFactor;
 
+// Texture related
+in vec2 textureUV;
 uniform sampler2D textureSampler;
 uniform float validTexture;			// If valid texture is 0.0f, there is no texture, if not there is one
+
+// Shadow related
+in vec4 projectedPosition;
+uniform sampler2D depthTextureSampler;
+
 
 void main()
 {
@@ -43,6 +47,22 @@ void main()
 	// Gamma correction
 	v = pow(v, vec3(1.0 / 2.2));
 
+	// Shadow calulations
+	float shadow = 1.0f;
+	if ((abs(projectedPosition.x) < projectedPosition.w) && (abs(projectedPosition.y) < projectedPosition.w)) {
+
+		// We put the coordinates in the [-1,1] range (xyz/w) then pass it in the [0,1] range (*0.5+0.5)
+		vec3 uv = (projectedPosition.xyz/projectedPosition.w)*0.5 + 0.5;
+
+		// Calculate depth
+		float depth = uv.z;
+
+		// Use the xy coordinates from the light space position
+		float existingDepth = texture(depthTextureSampler, uv.xy).r;
+		shadow = (depth >= existingDepth + 7e-3) ? 0.2 : 1.0;
+	}
+
+
 	// Gamma correction
-	finalColor = v;
+	finalColor = v * shadow;
 }
