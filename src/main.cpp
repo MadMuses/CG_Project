@@ -1,14 +1,45 @@
 #include "main.h"
 
+bool saveDepth = true;
+
 int main(void)
 {
     // Initalise window and OpenGl functions
-    window = initOpenGL(windowWidth, windowHeight);
-    if (window == NULL){return -1;};
+    if (!glfwInit())
+    {
+        std::cerr << "Failed to initialize GLFW." << std::endl;
+        return -1;
+    }
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // For MacOS
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // Open a window and create its OpenGL context
+    window = glfwCreateWindow(windowWidth, windowHeight, "Final project", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cerr << "Failed to open a GLFW window." << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
 
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetKeyCallback(window, key_callback);
+
+    // Load OpenGL functions, gladLoadGL returns the loaded version, 0 on error.
+    int version = gladLoadGL(glfwGetProcAddress);
+    if (version == 0)
+    {
+        std::cerr << "Failed to initialize OpenGL context." << std::endl;
+        return -1;
+    }
+
+    // Prepare shadow map size for shadow mapping. Usually this is the size of the window itself, but on some platforms like Mac this can be 2x the size of the window. Use glfwGetFramebufferSize to get the shadow map size properly.
+    glfwGetFramebufferSize(window, &depthMapWidth, &depthMapHeight);
 
     // Background
     glClearColor(0.0f, 0.0f, 0.0f, 0.f);
@@ -16,11 +47,33 @@ int main(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
+    // Create a frame buffer
+    glGenFramebuffers(1, &depthFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
+
+    // Create Framebuffer Texture
+    glGenTextures(1, &depthTexture);
+    glBindTexture(GL_TEXTURE_2D, depthTexture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, depthMapWidth, depthMapHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // Prevents edge bleeding
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Prevents edge bleeding
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cerr << "Framebuffer is not complete." << std::endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // Load shaders
     shaders = LoadShaders();
-
-    // Create depth FBO and Texture
-    LoadFBO(depthFBO,depthTexture,depthMapWidth,depthMapHeight);
 
     // All of our models
     Skybox skybox;
@@ -41,11 +94,8 @@ int main(void)
     lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(worldScale*100));
 
-    dome.initialize(shaders["objBasic"],shaders["objDepth"],30,"../assets/models/dome/dome.gltf", NULL,
-        glm::vec3(0.0f),
-        glm::vec3(domeScale * worldScale),
-        glm::vec3(0.0f,1.0f,0.0f),
-        0.0f);
+    dome.initialize(shaders["objShadow"],shaders["objDepth"],3,"../assets/models/dome/dome.gltf", NULL,
+        glm::vec3(0.0f),glm::vec3(domeScale * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -55,7 +105,6 @@ int main(void)
     glm::mat4 lightViewMatrix, lightProjectionMatrix;
     lightProjectionMatrix = glm::perspective(glm::radians(depthFoV), (float)depthMapWidth / depthMapHeight, depthNear, depthFar);
 
-    bool saveDepth = true;
     do
     {
     // Managing the depth texture creation
@@ -94,15 +143,16 @@ int main(void)
         skybox.render(vp);
         lightcube.render(vp,lightPosition);
 
-        dome.render(vp,lightPosition,lightIntensity);
+        dome.s_render(vp,lvp,lightPosition,lightIntensity,depthTexture);
 
         for (int i=0; i < 3;i++)
         {
             ships[i].render(vp,lightPosition,lightIntensity);
         }
+
         for (int i=0; i < 7;i++)
         {
-            plants[i].render(vp,lightPosition,lightIntensity);
+            plants[i].s_render(vp,lvp,lightPosition,lightIntensity,depthTexture);
         }
 
         // Count number of frames over a few seconds and take average

@@ -51,18 +51,18 @@ static float zFar = 3000.0f;
 
 // Lighting
 static glm::vec3 lightIntensity(0.25e6f);
-static glm::vec3 lightPosition(0.0, 1.1f * worldScale * domeScale, 0.0f);
 
 // Shadow mapping
-static glm::vec3 lightUp(1, 0, 0);
 static int depthMapWidth = 1024;
 static int depthMapHeight = 758;
 
 // Depth camera settings
+static glm::vec3 lightPosition(0.0, 1.1f * worldScale * domeScale, 0.0f);
+static glm::vec3 lightUp(0, 0, 1);
 static glm::vec3 depthlookat(0.0f, 0.0f, 0.0f);
 static float depthFoV = 90.0f;
-static float depthNear = 90.0f;
-static float depthFar = 350.0f;
+static float depthNear = 50.0f;
+static float depthFar = 400.0f;
 
 // Frame buffer stuff
 GLuint depthFBO;
@@ -132,12 +132,12 @@ void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float w
     for (int i = 0; i < 4; ++i)
     {
         std::string modelPath = "../assets/models/nature/" + names[i] + ".gltf";
-        plants[i].initialize(shaders["objBasic"],shaders["objDepth"],i + blockBindFloor,modelPath.c_str(), NULL,
+        plants[i].initialize(shaders["objShadow"],shaders["objDepth"],i + blockBindFloor,modelPath.c_str(), NULL,
         glm::vec3(40.0f,0.0f,-60.0f + 30.0f*i),
         glm::vec3(worldScale*0.5));
     }
 
-    plants[4].initialize(shaders["objBasic"],shaders["objDepth"],4+blockBindFloor,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png",
+    plants[4].initialize(shaders["objShadow"],shaders["objDepth"],4+blockBindFloor,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png",
     glm::vec3(50.0f,0.0f,0.0f),
     glm::vec3(worldScale*0.5));
 
@@ -145,7 +145,7 @@ void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float w
     {
         std::string treemodelPath = "../assets/models/nature/" + treenames[j-5] + ".gltf";
 
-        plants[j].initialize(shaders["objBasic"],shaders["objDepth"],j + blockBindFloor,treemodelPath.c_str(), "../assets/textures/nature/trees.png",
+        plants[j].initialize(shaders["objShadow"],shaders["objDepth"],j + blockBindFloor,treemodelPath.c_str(), "../assets/textures/nature/trees.png",
         treepositions[j-5],
         glm::vec3(worldScale*2.5));
     }
