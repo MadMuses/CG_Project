@@ -33,21 +33,3 @@ GLuint LoadTextureTileBox(const char *texture_file_path) {
     return texture;
 }
 
-std::map<std::string,GLuint> LoadShaders()
-{
-    std::map<std::string,GLuint> shaderlist;
-
-    GLuint programID = LoadShadersFromFile("../src/shaders/obj.vert", "../src/shaders/obj.frag");
-    GLuint depthProgramID = LoadShadersFromFile("../src/shaders/obj_depth.vert", "../src/shaders/obj_depth.frag");
-    GLuint shadowProgramID = LoadShadersFromFile("../src/shaders/obj_shadow.vert", "../src/shaders/obj_shadow.frag");
-
-    if (programID == 0 || depthProgramID == 0 || shadowProgramID == 0)
-    {
-        std::cerr << "Failed to load shaders." << std::endl;
-    }
-    shaderlist["objBasic"] = programID;
-    shaderlist["objDepth"] = depthProgramID;
-    shaderlist["objShadow"] = shadowProgramID;
-
-    return shaderlist;
-}

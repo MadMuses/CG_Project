@@ -14,10 +14,7 @@
 #include <iomanip>
 #include <render/shader.h>
 
-GLFWwindow* initOpenGL(int windowWidth, int windowHeight);
 void printVec(glm::vec3 v);
 GLuint LoadTextureTileBox(const char *texture_file_path);
-std::map<std::string,GLuint> LoadShaders();
-void LoadFBO(GLuint frameBufferID, GLuint depthTexture,int depthMapWidth, int depthMapHeight);
 
 #endif //HELPERS_H
