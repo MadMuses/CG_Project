@@ -6,6 +6,16 @@ void printVec(glm::vec3 v)
     std::cout << std::endl << "[" << v.x << ", " << v.y << ", " << v.z << "]" << std::endl;
 }
 
+void printMat(glm::mat4 v)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        std::cout << std::endl << "[" << v[i].x << ", " << v[i].y << ", " << v[i].z << ", " << v[i].w << "]";
+    }
+    std::cout << std::endl;
+};
+
+
 GLuint LoadTextureTileBox(const char *texture_file_path) {
     int w, h, channels;
     uint8_t* img = stbi_load(texture_file_path, &w, &h, &channels, 3);

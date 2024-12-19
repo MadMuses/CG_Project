@@ -15,6 +15,7 @@
 #include <render/shader.h>
 
 void printVec(glm::vec3 v);
+void printMat(glm::mat4 v);
 GLuint LoadTextureTileBox(const char *texture_file_path);
 
 #endif //HELPERS_H
