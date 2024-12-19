@@ -31,6 +31,7 @@
 
 #include "objects/obj/staticObj.h"
 #include "objects/obj/movingObj.h"
+#include "objects/obj/instancedObj.h"
 
 // Static elements
 static GLFWwindow *window;
@@ -186,18 +187,18 @@ std::map<std::string,GLuint> LoadShaders()
     GLuint programID = LoadShadersFromFile("../src/shaders/obj.vert", "../src/shaders/obj.frag");
     GLuint depthProgramID = LoadShadersFromFile("../src/shaders/obj_depth.vert", "../src/shaders/obj_depth.frag");
     GLuint shadowProgramID = LoadShadersFromFile("../src/shaders/obj_shadow.vert", "../src/shaders/obj_shadow.frag");
-    //GLuint instancedshadowProgramID = LoadShadersFromFile("../src/shaders/obj_s_instanced.vert", "../src/shaders/obj_s_instanced.frag");
+    GLuint instancedshadowProgramID = LoadShadersFromFile("../src/shaders/obj_inst_s.vert", "../src/shaders/obj_inst_s.frag");
     //GLuint instanceddepthProgramID = LoadShadersFromFile("../src/shaders/obj_depth_instanced.vert", "../src/shaders/obj_depth_instanced.frag");
 
 
-    if (programID == 0 || depthProgramID == 0 || shadowProgramID == 0)
+    if (programID == 0 || depthProgramID == 0 || shadowProgramID == 0 || instancedshadowProgramID == 0)
     {
         std::cerr << "Failed to load shaders." << std::endl;
     }
     shaderlist["objBasic"] = programID;
     shaderlist["objDepth"] = depthProgramID;
     shaderlist["objShadow"] = shadowProgramID;
-    //shaderlist["objInstancedShadow"] = instancedshadowProgramID;
+    shaderlist["objShadowInstanced"] = instancedshadowProgramID;
     //shaderlist["objInstancedDepth"] =instanceddepthProgramID;
 
     return shaderlist;

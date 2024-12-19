@@ -83,10 +83,10 @@ int main(void)
 
     staticObj virgo,gemini,scorpio;
     staticObj grass2,grass3,grass41,grass42,flower,spruce,oak;
-
+/*
     staticObj ships[3] = {virgo,gemini,scorpio};
     prepShips(shaders,ships,worldScale);
-
+*/
     staticObj plants[7] = {grass2,grass3,grass41,grass42,flower,spruce,oak};
     prepNature(shaders,plants,worldScale,5);
 
@@ -96,6 +96,13 @@ int main(void)
 
     dome.initialize(shaders["objShadow"],shaders["objDepth"],3,"../assets/models/dome/dome.gltf", NULL,
         glm::vec3(0.0f),glm::vec3(domeScale * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+
+    instancedObj TEST;
+
+    TEST.initialize(shaders["objShadowInstanced"],shaders["objDepth"],
+        30,5,
+    "../assets/models/ships/virgo.gltf", "../assets/textures/ships/virgo.png",
+    glm::vec3(300.0f,0.0f,0.0f),glm::vec3(8.0f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -144,11 +151,14 @@ int main(void)
         lightcube.render(vp,lightPosition);
 
         dome.s_render(vp,lvp,lightPosition,lightIntensity,depthTexture);
-
+/*
         for (int i=0; i < 3;i++)
         {
             ships[i].render(vp,lightPosition,lightIntensity);
         }
+*/
+
+        TEST.s_render(vp,lvp,lightPosition,lightIntensity,depthTexture);
 
         for (int i=0; i < 7;i++)
         {
@@ -173,7 +183,7 @@ int main(void)
     skybox.cleanup();
     dome.cleanup();
     lightcube.cleanup();
-    for (int i=0; i < 3;i++){ships[i].cleanup();}
+    //for (int i=0; i < 3;i++){ships[i].cleanup();}
     for (int i=0; i < 7;i++){plants[i].cleanup();}
 
     // Close OpenGL window and terminate GLFW
