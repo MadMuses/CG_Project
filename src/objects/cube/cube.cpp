@@ -38,6 +38,7 @@ void Cube::initialize(glm::vec3 position, glm::vec3 scale, glm::vec3 rotationAxi
 
 	// Get a handle for our "MVP" uniform
 	mvpMatrixID = glGetUniformLocation(programID, "MVP");
+	glBindVertexArray(0);
 }
 
 void Cube::render(glm::mat4 cameraMatrix, glm::vec3 newposition) {

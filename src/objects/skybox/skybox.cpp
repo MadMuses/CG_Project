@@ -57,7 +57,7 @@ void Skybox::initialize(glm::vec3 scale,glm::vec3 position ) {
 	{
 		textureSamplerIDs[i] = glGetUniformLocation(programID, ("textureSampler" + std::to_string(i)).c_str() );
 	}
-
+	glBindVertexArray(0);
 }
 
 void Skybox::render(glm::mat4 cameraMatrix) {
