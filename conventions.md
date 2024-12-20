@@ -8,6 +8,7 @@
 * _s     - for shadows
 * _i     - for instancing    *(WARNING : Can be combined, for example _si )*
 * _plmt  - for placement
-* _ dpth - for depth
+* _dpth - for depth
+* _a - for animations
 
 This is used both in naming methods and shaders.
