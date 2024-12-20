@@ -80,6 +80,7 @@ int main(void)
     Cube lightcube;
 
     gltfObj dome;
+    gltfObj bot;
 
     //staticObj virgo,gemini,scorpio;
     staticObj grass2,grass3,grass41,grass42,flower,spruce,oak;
@@ -93,6 +94,10 @@ int main(void)
     // initializing objects
     lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(worldScale*100));
+
+    bot.init_s();
+    bot.init_a();
+    bot.init(shaders["obj_s"],shaders["obj_dpth"],30,"../assets/models/bot/bot.gltf", NULL);
 
     dome.init_s();
     dome.init_plmt(glm::vec3(0.0f),glm::vec3(domeScale * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
@@ -145,6 +150,7 @@ int main(void)
         }
 
         TEST.depthRender(lvp);
+        bot.depthRender(lvp);
 
         if (saveDepth) {
             std::string filename = "depth_camera.png";
@@ -170,6 +176,7 @@ int main(void)
         lightcube.render(vp,lightPosition);
 
         dome.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+        bot.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 /*
         for (int i=0; i < 3;i++)
         {
@@ -189,6 +196,7 @@ int main(void)
 
         if (playAnimation) {
             thetime += deltaTime * playbackSpeed;
+            bot.update(thetime);
         }
 
         // Swap buffers
