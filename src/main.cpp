@@ -82,14 +82,14 @@ int main(void)
     gltfObj dome;
     gltfObj bot;
 
-    //staticObj virgo,gemini,scorpio;
-    staticObj grass2,grass3,grass41,grass42,flower,spruce,oak;
-/*
-    staticObj ships[3] = {virgo,gemini,scorpio};
-    prepShips(shaders,ships,worldScale);
-*/
-    staticObj plants[7] = {grass2,grass3,grass41,grass42,flower,spruce,oak};
-    prepNature(shaders,plants,worldScale,5);
+    gltfObj virgo,gemini,scorpio;
+    gltfObj grass2,grass3,grass41,grass42,flower,spruce,oak;
+
+    gltfObj ships[3] = {virgo,gemini,scorpio};
+    gltfObj plants[7] = {grass2,grass3,grass41,grass42,flower,spruce,oak};
+
+    prepNature(shaders,plants,worldScale,0);
+    prepShips(shaders,ships,worldScale,4);
 
     // initializing objects
     lightcube.initialize(lightPosition);
@@ -102,29 +102,6 @@ int main(void)
     dome.init_s();
     dome.init_plmt(glm::vec3(0.0f),glm::vec3(domeScale * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
     dome.init(shaders["obj_s"],shaders["obj_dpth"],30,"../assets/models/dome/dome.gltf", NULL);
-
-    GLfloat test_pos[15] = {
-        0.0f, -50.0f, 0.0f,
-        -450.0f, 50.0f, 0.0f,
-        -350.0f, 25.0f, -50.0f,
-        0.0f, 0.0f, 100.0f,
-        0.0f, 0.0f, 0.0f,
-    };
-
-    GLfloat test_angl[5] = {
-        0.0f, -50.0f, 30.0f, 0.0f, -90.0f
-    };
-
-    GLfloat test_scl[5] = {
-        1.0f, 0.4f, 0.2f, 1.5f, 0.8f
-    };
-
-    gltfObj TEST;
-
-    TEST.init_plmt(glm::vec3(300.0f,0.0f,0.0f),glm::vec3(8.0f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
-    TEST.init_s();
-    TEST.init_i(5,test_pos,test_scl,test_angl);
-    TEST.init(shaders["obj_si"],shaders["obj_dpth_i"],20,"../assets/models/ships/virgo.gltf", "../assets/textures/ships/virgo.png");
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -144,12 +121,10 @@ int main(void)
         glm::mat4 lvp = lightProjectionMatrix * lightViewMatrix;
 
         dome.depthRender(lvp);
-        for (int i=0; i < 7;i++)
-        {
+        for (int i=0; i < 7;i++){
             plants[i].depthRender(lvp);
         }
 
-        TEST.depthRender(lvp);
         bot.depthRender(lvp);
 
         if (saveDepth) {
@@ -177,18 +152,13 @@ int main(void)
 
         dome.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
         bot.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
-/*
-        for (int i=0; i < 3;i++)
-        {
+
+        for (int i=0; i < 3;i++){
             ships[i].render(vp,lightPosition,lightIntensity);
         }
-*/
 
-        TEST.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
-
-        for (int i=0; i < 7;i++)
-        {
-            plants[i].s_render(vp,lvp,lightPosition,lightIntensity,depthTexture);
+        for (int i=0; i < 7;i++){
+            plants[i].render(vp,lightPosition,lightIntensity,lvp,depthTexture);
         }
 
         // Count number of frames over a few seconds and take average
@@ -210,7 +180,7 @@ int main(void)
     skybox.cleanup();
     dome.cleanup();
     lightcube.cleanup();
-    //for (int i=0; i < 3;i++){ships[i].cleanup();}
+    for (int i=0; i < 3;i++){ships[i].cleanup();}
     for (int i=0; i < 7;i++){plants[i].cleanup();}
 
     // Close OpenGL window and terminate GLFW

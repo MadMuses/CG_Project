@@ -29,8 +29,6 @@
 #include "objects/skybox/skybox.h"
 #include "objects/cube/cube.h"
 
-#include "objects/obj/staticObj.h"
-//#include "objects/obj/movingObj.h"
 #include "objects/obj/gltfObj.h"
 
 // Static elements
@@ -108,7 +106,7 @@ void calcframerate()
     }
 };
 
-void prepShips(std::map<std::string,GLuint> shaders, staticObj ships[3],float worldScale)
+void prepShips(std::map<std::string,GLuint> shaders, gltfObj ships[3],float worldScale,int blockBindFloor)
 {
     std::string names[3] = {"virgo","scorpio","gemini"};
     float scales[3] = {8.0f,6.0f,5.0f};
@@ -118,14 +116,13 @@ void prepShips(std::map<std::string,GLuint> shaders, staticObj ships[3],float wo
         std::string modelPath = "../assets/models/ships/" + names[i] + ".gltf";
         std::string texturePath = "../assets/textures/ships/" + names[i] + ".png";
 
-        ships[i].init_s(shaders["obj_dpth"]);
-        ships[i].initialize(shaders["obj_def"],i,modelPath.c_str(), texturePath.c_str(),
-        glm::vec3(300.0f,0.0f,-300.0f + 300.0f*i),
-        glm::vec3(worldScale*scales[i]));
+        ships[i].init_s();
+        ships[i].init_plmt(glm::vec3(300.0f,0.0f,-300.0f + 300.0f*i),glm::vec3(worldScale*scales[i]),glm::vec3(0.0f),0.0f);
+        ships[i].init(shaders["obj_def"],shaders["obj_dpth"],i + blockBindFloor,modelPath.c_str(), texturePath.c_str());
     }
 }
 
-void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float worldScale, int blockBindFloor)
+void prepNature(std::map<std::string,GLuint> shaders,gltfObj plants[7],float worldScale, int blockBindFloor)
 {
     std::string names[4] = {"grass_2","grass_3","grass_4.1","grass_4.2"};
     std::string treenames[2] = {"spruce","oak"};
@@ -134,25 +131,35 @@ void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float w
     for (int i = 0; i < 4; ++i)
     {
         std::string modelPath = "../assets/models/nature/" + names[i] + ".gltf";
-        plants[i].init_s(shaders["obj_dpth"]);
-        plants[i].initialize(shaders["obj_s"],i + blockBindFloor,modelPath.c_str(), NULL,
-        glm::vec3(40.0f,0.0f,-60.0f + 30.0f*i),
-        glm::vec3(worldScale*0.5));
+        plants[i].init_s();
+        plants[i].init_plmt(
+            glm::vec3(40.0f,0.0f,-60.0f + 30.0f*i),
+            glm::vec3(worldScale*0.5),
+            glm::vec3(0.0f),
+            0.0f);
+        plants[i].init(shaders["obj_s"],shaders["obj_dpth"],i + blockBindFloor,modelPath.c_str(), NULL);
     }
 
-    plants[4].init_s(shaders["obj_dpth"]);
-    plants[4].initialize(shaders["obj_s"],4+blockBindFloor,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png",
-    glm::vec3(50.0f,0.0f,0.0f),
-    glm::vec3(worldScale*0.5));
+    plants[4].init_s();
+    plants[4].init_plmt(
+        glm::vec3(50.0f,0.0f,0.0f),
+        glm::vec3(worldScale*0.5),
+        glm::vec3(0.0f),
+        0.0f);
+    plants[4].init(shaders["obj_s"],shaders["obj_dpth"],4+blockBindFloor,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png");
+
 
     for (int j = 5; j < 7; ++j)
     {
         std::string treemodelPath = "../assets/models/nature/" + treenames[j-5] + ".gltf";
 
-        plants[j].init_s(shaders["obj_dpth"]);
-        plants[j].initialize(shaders["obj_s"],j + blockBindFloor,treemodelPath.c_str(), "../assets/textures/nature/trees.png",
-        treepositions[j-5],
-        glm::vec3(worldScale*2.5));
+        plants[j].init_s();
+        plants[j].init_plmt(
+            treepositions[j-5],
+            glm::vec3(worldScale*2.5),
+            glm::vec3(0.0f),
+            0.0f);
+        plants[j].init(shaders["obj_s"],shaders["obj_dpth"],j + blockBindFloor,treemodelPath.c_str(), "../assets/textures/nature/trees.png");
     }
 
 }
