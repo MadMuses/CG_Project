@@ -23,7 +23,6 @@ add_executable(main
 	src/main.cpp
 	src/helpers.cpp
 
-	src/objects/obj/staticObj.cpp
 	src/objects/obj/gltfObj.cpp
 
 	src/objects/skybox/skybox.cpp
