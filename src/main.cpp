@@ -79,9 +79,9 @@ int main(void)
     Skybox skybox;
     Cube lightcube;
 
-    staticObj dome;
+    gltfObj dome;
 
-    staticObj virgo,gemini,scorpio;
+    //staticObj virgo,gemini,scorpio;
     staticObj grass2,grass3,grass41,grass42,flower,spruce,oak;
 /*
     staticObj ships[3] = {virgo,gemini,scorpio};
@@ -94,15 +94,32 @@ int main(void)
     lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(worldScale*100));
 
-    dome.initialize(shaders["objShadow"],shaders["objDepth"],3,"../assets/models/dome/dome.gltf", NULL,
-        glm::vec3(0.0f),glm::vec3(domeScale * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    dome.init_s();
+    dome.init_plmt(glm::vec3(0.0f),glm::vec3(domeScale * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    dome.init(shaders["obj_s"],shaders["obj_dpth"],30,"../assets/models/dome/dome.gltf", NULL);
 
-    instancedObj TEST;
+    GLfloat test_pos[15] = {
+        0.0f, -50.0f, 0.0f,
+        -450.0f, 50.0f, 0.0f,
+        -350.0f, 25.0f, -50.0f,
+        0.0f, 0.0f, 100.0f,
+        0.0f, 0.0f, 0.0f,
+    };
 
-    TEST.initialize(shaders["objShadowInstanced"],shaders["objDepth"],
-        30,5,
-    "../assets/models/ships/virgo.gltf", "../assets/textures/ships/virgo.png",
-    glm::vec3(300.0f,0.0f,0.0f),glm::vec3(8.0f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    GLfloat test_angl[5] = {
+        0.0f, -50.0f, 30.0f, 0.0f, -90.0f
+    };
+
+    GLfloat test_scl[5] = {
+        1.0f, 0.4f, 0.2f, 1.5f, 0.8f
+    };
+
+    gltfObj TEST;
+
+    TEST.init_plmt(glm::vec3(300.0f,0.0f,0.0f),glm::vec3(8.0f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    TEST.init_s();
+    TEST.init_i(5,test_pos,test_scl,test_angl);
+    TEST.init(shaders["obj_si"],shaders["obj_dpth_i"],20,"../assets/models/ships/virgo.gltf", "../assets/textures/ships/virgo.png");
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -127,6 +144,8 @@ int main(void)
             plants[i].depthRender(lvp);
         }
 
+        TEST.depthRender(lvp);
+
         if (saveDepth) {
             std::string filename = "depth_camera.png";
             saveDepthTexture(depthFBO, filename);
@@ -150,7 +169,7 @@ int main(void)
         skybox.render(vp);
         lightcube.render(vp,lightPosition);
 
-        dome.s_render(vp,lvp,lightPosition,lightIntensity,depthTexture);
+        dome.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 /*
         for (int i=0; i < 3;i++)
         {
@@ -158,7 +177,7 @@ int main(void)
         }
 */
 
-        TEST.s_render(vp,lvp,lightPosition,lightIntensity,depthTexture);
+        TEST.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
         for (int i=0; i < 7;i++)
         {

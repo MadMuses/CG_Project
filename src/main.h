@@ -30,8 +30,8 @@
 #include "objects/cube/cube.h"
 
 #include "objects/obj/staticObj.h"
-#include "objects/obj/movingObj.h"
-#include "objects/obj/instancedObj.h"
+//#include "objects/obj/movingObj.h"
+#include "objects/obj/gltfObj.h"
 
 // Static elements
 static GLFWwindow *window;
@@ -118,7 +118,8 @@ void prepShips(std::map<std::string,GLuint> shaders, staticObj ships[3],float wo
         std::string modelPath = "../assets/models/ships/" + names[i] + ".gltf";
         std::string texturePath = "../assets/textures/ships/" + names[i] + ".png";
 
-        ships[i].initialize(shaders["objBasic"],shaders["objDepth"],i,modelPath.c_str(), texturePath.c_str(),
+        ships[i].init_s(shaders["obj_dpth"]);
+        ships[i].initialize(shaders["obj_def"],i,modelPath.c_str(), texturePath.c_str(),
         glm::vec3(300.0f,0.0f,-300.0f + 300.0f*i),
         glm::vec3(worldScale*scales[i]));
     }
@@ -133,12 +134,14 @@ void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float w
     for (int i = 0; i < 4; ++i)
     {
         std::string modelPath = "../assets/models/nature/" + names[i] + ".gltf";
-        plants[i].initialize(shaders["objShadow"],shaders["objDepth"],i + blockBindFloor,modelPath.c_str(), NULL,
+        plants[i].init_s(shaders["obj_dpth"]);
+        plants[i].initialize(shaders["obj_s"],i + blockBindFloor,modelPath.c_str(), NULL,
         glm::vec3(40.0f,0.0f,-60.0f + 30.0f*i),
         glm::vec3(worldScale*0.5));
     }
 
-    plants[4].initialize(shaders["objShadow"],shaders["objDepth"],4+blockBindFloor,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png",
+    plants[4].init_s(shaders["obj_dpth"]);
+    plants[4].initialize(shaders["obj_s"],4+blockBindFloor,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png",
     glm::vec3(50.0f,0.0f,0.0f),
     glm::vec3(worldScale*0.5));
 
@@ -146,7 +149,8 @@ void prepNature(std::map<std::string,GLuint> shaders,staticObj plants[7],float w
     {
         std::string treemodelPath = "../assets/models/nature/" + treenames[j-5] + ".gltf";
 
-        plants[j].initialize(shaders["objShadow"],shaders["objDepth"],j + blockBindFloor,treemodelPath.c_str(), "../assets/textures/nature/trees.png",
+        plants[j].init_s(shaders["obj_dpth"]);
+        plants[j].initialize(shaders["obj_s"],j + blockBindFloor,treemodelPath.c_str(), "../assets/textures/nature/trees.png",
         treepositions[j-5],
         glm::vec3(worldScale*2.5));
     }
@@ -184,22 +188,21 @@ std::map<std::string,GLuint> LoadShaders()
 {
     std::map<std::string,GLuint> shaderlist;
 
-    GLuint programID = LoadShadersFromFile("../src/shaders/obj.vert", "../src/shaders/obj.frag");
-    GLuint depthProgramID = LoadShadersFromFile("../src/shaders/obj_depth.vert", "../src/shaders/obj_depth.frag");
-    GLuint shadowProgramID = LoadShadersFromFile("../src/shaders/obj_shadow.vert", "../src/shaders/obj_shadow.frag");
-    GLuint instancedshadowProgramID = LoadShadersFromFile("../src/shaders/obj_inst_s.vert", "../src/shaders/obj_inst_s.frag");
-    //GLuint instanceddepthProgramID = LoadShadersFromFile("../src/shaders/obj_depth_instanced.vert", "../src/shaders/obj_depth_instanced.frag");
+    GLuint programID = LoadShadersFromFile("../src/shaders/obj_def.vert", "../src/shaders/obj_def.frag");
+    GLuint depthProgramID = LoadShadersFromFile("../src/shaders/obj_dpth.vert", "../src/shaders/obj_dpth.frag");
+    GLuint shadowProgramID = LoadShadersFromFile("../src/shaders/obj_s.vert", "../src/shaders/obj_s.frag");
+    GLuint instancedshadowProgramID = LoadShadersFromFile("../src/shaders/obj_si.vert", "../src/shaders/obj_s.frag");
+    GLuint depthProgramID_i = LoadShadersFromFile("../src/shaders/obj_dpth_i.vert", "../src/shaders/obj_dpth.frag");
 
-
-    if (programID == 0 || depthProgramID == 0 || shadowProgramID == 0 || instancedshadowProgramID == 0)
+    if (programID == 0 || depthProgramID == 0 || shadowProgramID == 0 || instancedshadowProgramID == 0 || depthProgramID_i == 0)
     {
         std::cerr << "Failed to load shaders." << std::endl;
     }
-    shaderlist["objBasic"] = programID;
-    shaderlist["objDepth"] = depthProgramID;
-    shaderlist["objShadow"] = shadowProgramID;
-    shaderlist["objShadowInstanced"] = instancedshadowProgramID;
-    //shaderlist["objInstancedDepth"] =instanceddepthProgramID;
+    shaderlist["obj_def"] = programID;
+    shaderlist["obj_dpth"] = depthProgramID;
+    shaderlist["obj_s"] = shadowProgramID;
+    shaderlist["obj_si"] = instancedshadowProgramID;
+    shaderlist["obj_dpth_i"] = depthProgramID_i;
 
     return shaderlist;
 }

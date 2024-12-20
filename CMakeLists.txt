@@ -24,8 +24,7 @@ add_executable(main
 	src/helpers.cpp
 
 	src/objects/obj/staticObj.cpp
-	src/objects/obj/movingObj.cpp
-	src/objects/obj/instancedObj.cpp
+	src/objects/obj/gltfObj.cpp
 
 	src/objects/skybox/skybox.cpp
 	src/objects/cube/cube.cpp
