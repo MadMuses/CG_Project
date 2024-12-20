@@ -1,4 +1,5 @@
 #version 330 core
+
 out vec3 finalColor;
 
 in vec3 worldPosition;
@@ -28,8 +29,7 @@ void main()
 	if (validTexture == 1.0f){
 		color = texture(textureSampler,textureUV).rgb;
 	}else{
-		// Color (calculated from RGBa)
-		color = vec3(baseColorFactor[0], baseColorFactor[1], baseColorFactor[2]);
+		color = vec3(baseColorFactor[0], baseColorFactor[1], baseColorFactor[2]); 		// Color (calculated from RGBa)
 	}
 
 	// Lighting

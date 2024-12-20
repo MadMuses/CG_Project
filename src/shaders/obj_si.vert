@@ -25,9 +25,7 @@ layout(std140) uniform jointMatrices {
     mat4 jointMatricesVec[25];
 };
 
-
 void main() {
-
     // Textures
     textureUV = vertexUV;
 
@@ -46,7 +44,7 @@ void main() {
 
     // World-space geometry
     worldPosition = (skinMat * i_modelMat * vec4(vertexPosition,1)).xyz;
-    worldNormal = normalize((skinMatNormal * i_modelMat * vec4(vertexPosition, 1.0)).xyz);
+    worldNormal = normalize((skinMatNormal *  i_modelMat * vec4(vertexNormal, 0.0)).xyz);
 
     // Transform vertex
     gl_Position =  MVP * skinMat * i_modelMat * vec4(vertexPosition,1);
