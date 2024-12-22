@@ -31,5 +31,5 @@ void main() {
     + jointMatricesVec[int(j_IDs.w)]* normweights.w;
 
     // Transform vertex
-    gl_Position =  MVP * skinMat * i_modelMat * vec4(vertexPosition,1);
+    gl_Position =  MVP * i_modelMat * skinMat * vec4(vertexPosition,1);
 }

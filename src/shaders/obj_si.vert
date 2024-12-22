@@ -43,10 +43,10 @@ void main() {
     mat4 skinMatNormal = transpose(inverse(skinMat));
 
     // World-space geometry
-    worldPosition = (skinMat * i_modelMat * vec4(vertexPosition,1)).xyz;
-    worldNormal = normalize((skinMatNormal *  i_modelMat * vec4(vertexNormal, 0.0)).xyz);
+    worldPosition = (skinMat * vec4(vertexPosition,1)).xyz;
+    worldNormal = normalize((skinMatNormal * vec4(vertexNormal, 0.0)).xyz);
 
     // Transform vertex
-    gl_Position =  MVP * skinMat * i_modelMat * vec4(vertexPosition,1);
-    projectedPosition = LVP * skinMat * i_modelMat * vec4(vertexPosition,1.0f);
+    gl_Position =  MVP * i_modelMat * skinMat * vec4(vertexPosition,1);
+    projectedPosition = LVP * i_modelMat * skinMat * vec4(vertexPosition,1.0f);
 }
