@@ -198,9 +198,8 @@ int main(void)
     Cube lightcube;
 
     // Render ships
-    gltfObj virgo,gemini,scorpio;
-    gltfObj ships[3] = {virgo,gemini,scorpio};
-    prepShips(shaders,ships,7);
+    gltfObj virgo,gemini,scorpio,virgo1,gemini1,scorpio1;
+    gltfObj ships[6] = {virgo,gemini,scorpio,virgo1,gemini1,scorpio1};
 
     // Most complicated to setup (instancing) : Plants
     gltfObj grass2,grass3,grass41,grass42;
@@ -259,16 +258,31 @@ int main(void)
     flowers.init_plmt(glm::vec3(-7.0f * 7.0f, 0.0f, -9.0f * 7.0f),glm::vec3(0.5f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
     flowers.init_s();
     flowers.init_i(flowerAmount,flowers_pos,flowers_scl,flowers_angl);
-    flowers.init(shaders["obj_si"],shaders["obj_dpth_i"],20,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png");
+    flowers.init(shaders["obj_si"],shaders["obj_dpth_i"],7,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png");
 
     flowers2.init_plmt(glm::vec3(2.0f * 7.0f, 0.0f, 9.0f*7.0f),glm::vec3(0.5f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
     flowers2.init_s();
     flowers2.init_i(flowerAmount,flowers_pos,flowers_scl,flowers_angl);
-    flowers2.init(shaders["obj_si"],shaders["obj_dpth_i"],20,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png");
+    flowers2.init(shaders["obj_si"],shaders["obj_dpth_i"],8,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png");
 
+    // Dome
     dome.init_s();
-    dome.init_plmt(glm::vec3(0.0f),glm::vec3(domeScale),glm::vec3(0.0f,1.0f,0.0f),42.5f);
-    dome.init(shaders["obj_s"],shaders["obj_dpth"],10,"../assets/models/dome/dome.gltf", NULL);
+    dome.init_plmt(glm::vec3(0.0f),glm::vec3(domeScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    dome.init(shaders["obj_s"],shaders["obj_dpth"],9,"../assets/models/dome/dome.gltf", NULL);
+
+    // Ships
+    prepShips(shaders,ships,10);
+
+    gltfObj flame;
+    flame.init_a();
+    flame.init_plmt(glm::vec3(0.0f,-7.0f,228.0f),glm::vec3(3.5*worldScale),glm::vec3(0.0f,0.0f,1.0f),90.0f);
+    flame.init(shaders["obj_def"],shaders["obj_dpth"],20, "../assets/models/dome/flame.gltf", "../assets/textures/dome/flame.png");
+
+    gltfObj flame2;
+    flame2.init_a();
+    flame2.init_plmt(glm::vec3(0.0f,-7.0f,-220.0f),glm::vec3(3.5*worldScale),glm::vec3(0.0f,0.0f,1.0f),90.0f);
+    flame2.init(shaders["obj_def"],shaders["obj_dpth"],21, "../assets/models/dome/flame.gltf", "../assets/textures/dome/flame.png");
+
 
 // The two different cameras
 
@@ -335,11 +349,24 @@ int main(void)
         oak.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
         spruce.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
+        // Render and move ships
+        moveShips(ships, 0.5f);
+        for (int i =0; i < 6; i++)
+        {
+            ships[i].render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+        }
+
+        // Render the flame
+        flame.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+        flame2.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+
         // Count number of frames over a few seconds and take average
         calcframerate();
 
         if (playAnimation) {
             thetime += deltaTime * playbackSpeed;
+            flame.update(thetime);
+            flame2.update(thetime);
         }
 
         // Swap buffers
@@ -353,7 +380,7 @@ int main(void)
     skybox.cleanup();
     dome.cleanup();
     lightcube.cleanup();
-    for (int i=0; i < 3;i++){ships[i].cleanup();}
+    for (int i=0; i < 6;i++){ships[i].cleanup();}
     for (int i=0; i < 4;i++){grass[i].cleanup();}
 
     // Close OpenGL window and terminate GLFW

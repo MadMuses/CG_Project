@@ -57,9 +57,9 @@ static int windowHeight = 768;
 
 // Camera
 static glm::vec3 eye_center (0.0f, 20.f, 0.0f);
-static glm::vec3 lookat     (100.0f, 0.0f, 0.0f);
+static glm::vec3 lookat     (0.0f, 0.0f, 100.0f);
 static glm::vec3 up         (0.0f, 1.0f, 0.0f);
-static float FoV    = 45.0f;
+static float FoV    = 60.0f;
 static float zNear  = 10.0f;
 static float zFar   = 3000.0f;
 
@@ -84,8 +84,8 @@ static int depthMapHeight = 758;
 // Depth camera settings
 static glm::vec3 lightPosition  (0.0, 1.1f * domeScale, 0.0f);
 static glm::vec3 depthlookat    (0.0f, 0.0f, 0.0f);
-static glm::vec3 lightUp        (0, 0, 1);
-static float depthFoV   = 90.0f;
+static glm::vec3 lightUp        (1, 0, 0);
+static float depthFoV   = 110.0f;
 static float depthNear  = 50.0f;
 static float depthFar   = 400.0f;
 
@@ -93,7 +93,7 @@ static float depthFar   = 400.0f;
 
 // Animation
 static bool playAnimation = true;
-static float playbackSpeed = 2.0f;
+static float playbackSpeed = 0.5f;
 
 // FPS tracking
 float deltaTime;
@@ -174,10 +174,11 @@ std::vector<glm::vec3> calcDomeGrid(int pixelSize, int cx, int cy)
 
 //---
 
-void prepShips(std::map<std::string,GLuint> shaders, gltfObj ships[3],int blockBindFloor)
+void prepShips(std::map<std::string,GLuint> shaders, gltfObj ships[6],int blockBindFloor)
 {
     std::string names[3] = {"virgo","scorpio","gemini"};
-    float scales[3] = {8.0f,6.0f,5.0f};
+    float scales[3] = {2*8.0f,2*6.0f,2*5.0f};
+    float rot[3] = {-90.0f,-90.0f,-90.0f};
 
     for (int i = 0; i < 3; ++i)
     {
@@ -185,10 +186,89 @@ void prepShips(std::map<std::string,GLuint> shaders, gltfObj ships[3],int blockB
         std::string texturePath = "../assets/textures/ships/" + names[i] + ".png";
 
         ships[i].init_s();
-        ships[i].init_plmt(glm::vec3(-2500.0f,0.0f,0.0f),glm::vec3(worldScale*scales[i]),glm::vec3(0.0f),0.0f);
+        ships[i].init_plmt(glm::vec3(-3000.0f,0.0f,0.0f),glm::vec3(worldScale*scales[i]),glm::vec3(0.0f,1.0f,0.0f),rot[i]);
+        ships[i].init(shaders["obj_def"],shaders["obj_dpth"],i + blockBindFloor,modelPath.c_str(), texturePath.c_str());
+    }
+    for (int i = 3; i < 6; ++i)
+    {
+        std::string modelPath = "../assets/models/ships/" + names[i-3] + ".gltf";
+        std::string texturePath = "../assets/textures/ships/" + names[i-3] + ".png";
+
+        ships[i].init_s();
+        ships[i].init_plmt(glm::vec3(-3000.0f,0.0f,0.0f),glm::vec3(worldScale*scales[i-3]),glm::vec3(0.0f,1.0f,0.0f),rot[i-3]);
         ships[i].init(shaders["obj_def"],shaders["obj_dpth"],i + blockBindFloor,modelPath.c_str(), texturePath.c_str());
     }
 }
+
+//---- Managing ship movement ----
+
+//---- Variables -----
+
+bool virgoOOB,scorpioOOB,geminiOOB,virgo1OOB,scorpio1OOB,gemini1OOB;
+bool shipsOOB[6] = {virgoOOB,scorpioOOB,geminiOOB,virgo1OOB,scorpio1OOB,gemini1OOB};
+
+
+//---- Methods ----
+
+void isOOB(gltfObj ships[6], float bound)
+{
+    for(int i = 0; i < 6; i++)
+    {
+        if(ships[i].position.x < -bound){
+            shipsOOB[i] = true;
+        }
+    }
+}
+
+glm::vec3 genShipxzy(float bound){
+
+    int zBound = 1000;
+    int yBound = 1000;
+    int xBound = 1500;
+
+    // Generate the new positions
+    int y = 0 + rand() % yBound;
+    int z = -zBound + rand() % 2*zBound;
+    int x = bound + rand() % xBound;
+
+    if (y <= 500)
+    {
+        if(y % 2 == 0){
+            z = -zBound + rand() % (zBound-500);
+        }else{
+            z = 500 + rand() % (zBound-500);
+        }
+    }
+    // Send the result as vector
+    return glm::vec3(x,y,z);
+
+}
+
+void moveShips(gltfObj ships[6], float currentStep)
+{
+    float bound = 1500;
+    for(int i = 0; i < 6; i++)
+    {
+        // Update the ships boolean
+        isOOB(ships,bound);
+
+        // Get the entry point for ships OOB
+        if (shipsOOB[i]){
+            ships[i].position = genShipxzy(bound);
+            shipsOOB[i] = false;
+        }
+
+        // Move the ships (along the x axis)
+        ships[i].init_plmt(
+           ships[i].position + glm::vec3(-currentStep,0.0f,0.0f),
+           ships[i].scale,
+           ships[i].rotationAxis,
+           ships[i].rotationAngle);
+    }
+};
+
+
+//---- Back to unrelated methods ----
 
 static void saveDepthTexture(GLuint fbo, std::string filename) {
     int width = depthMapWidth;
