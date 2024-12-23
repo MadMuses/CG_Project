@@ -75,33 +75,202 @@ int main(void)
     // Load shaders
     shaders = LoadShaders();
 
-    // All of our models
+    // Generate positions :
+
+    // Doing grass
+
+    // Creating the grid with all positions
+    std::vector<glm::vec3> pos_vector = calcDomeGrid(7,0,0);
+
+    //---- Based on : https://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
+    // Adapted to glm::vec3 using ChatGPT
+
+    // Remove doubles
+    // Creating a comparator
+    auto vec3_less = [](const glm::vec3& a, const glm::vec3& b) {
+        if (a.x != b.x) return a.x < b.x;
+        if (a.y != b.y) return a.y < b.y;
+        return a.z < b.z;
+    };
+
+    // Sort vector
+    std::sort(pos_vector.begin(), pos_vector.end(), vec3_less);
+
+    // Use std::unique to find doubles
+    auto it = std::unique(pos_vector.begin(), pos_vector.end(), [](const glm::vec3& a, const glm::vec3& b) {
+        return a.x == b.x && a.y == b.y && a.z == b.z;
+    });
+
+    // Remove the doubles
+    pos_vector.erase(it, pos_vector.end());
+
+    //----
+
+    // Shuffle the vector
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(pos_vector.begin(), pos_vector.end(),g);
+
+    // Put the positions from pos_vector in the grid_pos
+    size_t index = 0;
+    GLfloat grid_pos[pos_vector.size() * 3];
+    for (const auto& vec : pos_vector) {
+        grid_pos[index++] = vec.x;
+        grid_pos[index++] = vec.y;
+        grid_pos[index++] = vec.z;
+    };
+    int grassAmount = pos_vector.size()/4;
+
+    // Create the grass position attributes
+    GLfloat grass_pos_2[grassAmount*3];
+    GLfloat grass_pos_3[grassAmount*3];
+    GLfloat grass_pos_41[grassAmount*3];
+    GLfloat grass_pos_42[grassAmount*3];
+
+    // Get values from grid_pos
+    std::memcpy(grass_pos_2,    grid_pos + 0,                   grassAmount * 3 * sizeof(GLfloat));
+    std::memcpy(grass_pos_3,    grid_pos + grassAmount*3,   grassAmount * 3 * sizeof(GLfloat));
+    std::memcpy(grass_pos_41,   grid_pos + grassAmount*6,   grassAmount * 3 * sizeof(GLfloat));
+    std::memcpy(grass_pos_42,   grid_pos + grassAmount*9,  grassAmount * 3 * sizeof(GLfloat));
+
+    // Create scale and rotation
+    GLfloat grass_scl[grassAmount];
+    GLfloat grass_angl[grassAmount];
+
+    for (int i=0; i < grassAmount; i++)
+    {
+        grass_scl[i] = (95 + rand() % 10)/100.0f;
+        grass_angl[i] = (-600 + rand() % 1200)/10.0f;
+    }
+
+    // FLOWER PATCH LETS GOO
+    int flowerAmount = 52;
+    GLfloat flowers_scl[flowerAmount];
+    GLfloat flowers_angl[flowerAmount];
+    GLfloat flowers_pos[flowerAmount*3];
+
+    int z = 9;
+    int fIndex = 0;
+    for (int i=0; i < 4; ++i)
+    {
+        if (i >=2){z-=2;}
+        for (int j=0; j < z; ++j)
+        {
+            flowers_pos[fIndex++] = i*7;
+            flowers_pos[fIndex++] = 0;
+            flowers_pos[fIndex++] = j*7 - (z-1)*3.5;
+
+            if (i > 0)
+            {
+                flowers_pos[fIndex++] = -i*7;
+                flowers_pos[fIndex++] = 0;
+                flowers_pos[fIndex++] = j*7 - (z-1)*3.5;
+            }
+        }
+    }
+
+    for (int i = 0; i < flowerAmount; ++i)
+    {
+        flowers_scl[i] = (95 + rand() % 30)/100.0f;
+        flowers_angl[i] = (-600 + rand() % 1200)/10.0f;
+    }
+
+    // Planting the trees
+    GLfloat oak_pos[9] = {
+        -70.0f,0.0f,-28.0f,
+        63.0f,0.0f,35.0f,
+        35.0f,0.0f,-42.0f
+    };
+    GLfloat oak_scl[3] = {0.5f,1.1f,0.9f};
+    GLfloat oak_angl[3] = {0.0f,63.0f,45.0f};
+
+    GLfloat spruce_pos[6] = {
+        -14.0f,0.0f,21.0f,
+        -63.0f,0.0f,49.0f
+    };
+    GLfloat spruce_scl[2] = {0.9f,1.4f};
+    GLfloat spruce_angl[2] = {0.0f,63.0f};
+
+// Create all of the objects :
+
+    // Basic objects
     Skybox skybox;
     Cube lightcube;
 
-    gltfObj dome;
-    gltfObj bot;
-
+    // Render ships
     gltfObj virgo,gemini,scorpio;
-    gltfObj grass2,grass3,grass41,grass42,flower,spruce,oak;
-
     gltfObj ships[3] = {virgo,gemini,scorpio};
-    gltfObj plants[7] = {grass2,grass3,grass41,grass42,flower,spruce,oak};
+    prepShips(shaders,ships,7);
 
-    prepNature(shaders,plants,worldScale,0);
-    prepShips(shaders,ships,worldScale,4);
+    // Most complicated to setup (instancing) : Plants
+    gltfObj grass2,grass3,grass41,grass42;
+    gltfObj grass[4] = {grass2,grass3,grass41,grass42};
+
+    // Placing the flowers
+    gltfObj flowers;
+    gltfObj flowers2;
+
+    // Static Obj : Trees
+    gltfObj spruce,oak;
+
+    // Static object : The dome
+    gltfObj dome;
+
+// Initialise objects :
 
     // initializing objects
     lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(worldScale*100));
 
-    bot.init_s();
-    bot.init_a();
-    bot.init(shaders["obj_s"],shaders["obj_dpth"],30,"../assets/models/bot/bot.gltf", NULL);
+    // Static Obj : Grass blocks
+    // Grass elements
+    std::string names[4] = {"grass_2","grass_3","grass_4.1","grass_4.2"};
+
+    // Position + shadow inits
+    for (int i = 0; i < 4; ++i)
+    {
+        grass[i].init_s();
+        grass[i].init_plmt(glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.5f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    }
+
+    // Instancing position buffer changes so we init them here
+    grass[0].init_i(grassAmount,grass_pos_2,grass_scl,grass_angl);
+    grass[1].init_i(grassAmount,grass_pos_3,grass_scl,grass_angl);
+    grass[2].init_i(grassAmount,grass_pos_41,grass_scl,grass_angl);
+    grass[3].init_i(grassAmount,grass_pos_42,grass_scl,grass_angl);
+
+    // Global init
+    for (int i = 0; i < 4; ++i)
+    {
+        std::string modelPath = "../assets/models/nature/" + names[i] + ".gltf";
+        grass[i].init(shaders["obj_si"],shaders["obj_dpth_i"],i,modelPath.c_str(), NULL);
+    }
+
+    oak.init_s();
+    oak.init_plmt(glm::vec3(0.0f),glm::vec3(worldScale*2.5),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    oak.init_i(3,oak_pos,oak_scl,oak_angl);
+    oak.init(shaders["obj_si"],shaders["obj_dpth_i"],5,"../assets/models/nature/oak.gltf", "../assets/textures/nature/trees.png");
+
+    spruce.init_s();
+    spruce.init_plmt(glm::vec3(0.0f),glm::vec3(worldScale*2.5),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    spruce.init_i(2,spruce_pos,spruce_scl,spruce_angl);
+    spruce.init(shaders["obj_si"],shaders["obj_dpth_i"],6,"../assets/models/nature/spruce.gltf", "../assets/textures/nature/trees.png");
+
+    flowers.init_plmt(glm::vec3(-7.0f * 7.0f, 0.0f, -9.0f * 7.0f),glm::vec3(0.5f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    flowers.init_s();
+    flowers.init_i(flowerAmount,flowers_pos,flowers_scl,flowers_angl);
+    flowers.init(shaders["obj_si"],shaders["obj_dpth_i"],20,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png");
+
+    flowers2.init_plmt(glm::vec3(2.0f * 7.0f, 0.0f, 9.0f*7.0f),glm::vec3(0.5f * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    flowers2.init_s();
+    flowers2.init_i(flowerAmount,flowers_pos,flowers_scl,flowers_angl);
+    flowers2.init(shaders["obj_si"],shaders["obj_dpth_i"],20,"../assets/models/nature/flower.gltf", "../assets/textures/nature/flowers.png");
 
     dome.init_s();
-    dome.init_plmt(glm::vec3(0.0f),glm::vec3(domeScale * worldScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
-    dome.init(shaders["obj_s"],shaders["obj_dpth"],30,"../assets/models/dome/dome.gltf", NULL);
+    dome.init_plmt(glm::vec3(0.0f),glm::vec3(domeScale),glm::vec3(0.0f,1.0f,0.0f),42.5f);
+    dome.init(shaders["obj_s"],shaders["obj_dpth"],10,"../assets/models/dome/dome.gltf", NULL);
+
+// The two different cameras
 
     // Camera setup
     glm::mat4 viewMatrix, projectionMatrix;
@@ -111,6 +280,7 @@ int main(void)
     glm::mat4 lightViewMatrix, lightProjectionMatrix;
     lightProjectionMatrix = glm::perspective(glm::radians(depthFoV), (float)depthMapWidth / depthMapHeight, depthNear, depthFar);
 
+// "Game" loop
     do
     {
     // Managing the depth texture creation
@@ -121,11 +291,17 @@ int main(void)
         glm::mat4 lvp = lightProjectionMatrix * lightViewMatrix;
 
         dome.depthRender(lvp);
-        for (int i=0; i < 7;i++){
-            plants[i].depthRender(lvp);
+
+        flowers.depthRender(lvp);
+        flowers2.depthRender(lvp);
+
+        for (int i =0; i < 4; i++)
+        {
+            grass[i].depthRender(lvp);
         }
 
-        bot.depthRender(lvp);
+        oak.depthRender(lvp);
+        spruce.depthRender(lvp);
 
         if (saveDepth) {
             std::string filename = "depth_camera.png";
@@ -151,22 +327,19 @@ int main(void)
         lightcube.render(vp,lightPosition);
 
         dome.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
-        bot.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
-        for (int i=0; i < 3;i++){
-            ships[i].render(vp,lightPosition,lightIntensity);
-        }
+        flowers.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+        flowers2.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
-        for (int i=0; i < 7;i++){
-            plants[i].render(vp,lightPosition,lightIntensity,lvp,depthTexture);
-        }
+        for (int i =0; i < 4; i++){grass[i].render(vp,lightPosition,lightIntensity,lvp,depthTexture);}
+        oak.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+        spruce.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
         // Count number of frames over a few seconds and take average
         calcframerate();
 
         if (playAnimation) {
             thetime += deltaTime * playbackSpeed;
-            bot.update(thetime);
         }
 
         // Swap buffers
@@ -181,7 +354,7 @@ int main(void)
     dome.cleanup();
     lightcube.cleanup();
     for (int i=0; i < 3;i++){ships[i].cleanup();}
-    for (int i=0; i < 7;i++){plants[i].cleanup();}
+    for (int i=0; i < 4;i++){grass[i].cleanup();}
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
