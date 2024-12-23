@@ -3,7 +3,7 @@
 
 void printVec(glm::vec3 v)
 {
-    std::cout << std::endl << "[" << v.x << ", " << v.y << ", " << v.z << "]" << std::endl;
+    std::cout << "[" << v.x << ", " << v.y << ", " << v.z << "]" << std::endl;
 }
 
 void printMat(glm::mat4 v)
