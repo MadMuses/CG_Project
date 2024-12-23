@@ -75,121 +75,8 @@ int main(void)
     // Load shaders
     shaders = LoadShaders();
 
-    // Generate positions :
-
-    // Doing grass
-
-    // Creating the grid with all positions
-    std::vector<glm::vec3> pos_vector = calcDomeGrid(7,0,0);
-
-    //---- Based on : https://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
-    // Adapted to glm::vec3 using ChatGPT
-
-    // Remove doubles
-    // Creating a comparator
-    auto vec3_less = [](const glm::vec3& a, const glm::vec3& b) {
-        if (a.x != b.x) return a.x < b.x;
-        if (a.y != b.y) return a.y < b.y;
-        return a.z < b.z;
-    };
-
-    // Sort vector
-    std::sort(pos_vector.begin(), pos_vector.end(), vec3_less);
-
-    // Use std::unique to find doubles
-    auto it = std::unique(pos_vector.begin(), pos_vector.end(), [](const glm::vec3& a, const glm::vec3& b) {
-        return a.x == b.x && a.y == b.y && a.z == b.z;
-    });
-
-    // Remove the doubles
-    pos_vector.erase(it, pos_vector.end());
-
-    //----
-
-    // Shuffle the vector
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(pos_vector.begin(), pos_vector.end(),g);
-
-    // Put the positions from pos_vector in the grid_pos
-    size_t index = 0;
-    GLfloat grid_pos[pos_vector.size() * 3];
-    for (const auto& vec : pos_vector) {
-        grid_pos[index++] = vec.x;
-        grid_pos[index++] = vec.y;
-        grid_pos[index++] = vec.z;
-    };
-    int grassAmount = pos_vector.size()/4;
-
-    // Create the grass position attributes
-    GLfloat grass_pos_2[grassAmount*3];
-    GLfloat grass_pos_3[grassAmount*3];
-    GLfloat grass_pos_41[grassAmount*3];
-    GLfloat grass_pos_42[grassAmount*3];
-
-    // Get values from grid_pos
-    std::memcpy(grass_pos_2,    grid_pos + 0,                   grassAmount * 3 * sizeof(GLfloat));
-    std::memcpy(grass_pos_3,    grid_pos + grassAmount*3,   grassAmount * 3 * sizeof(GLfloat));
-    std::memcpy(grass_pos_41,   grid_pos + grassAmount*6,   grassAmount * 3 * sizeof(GLfloat));
-    std::memcpy(grass_pos_42,   grid_pos + grassAmount*9,  grassAmount * 3 * sizeof(GLfloat));
-
-    // Create scale and rotation
-    GLfloat grass_scl[grassAmount];
-    GLfloat grass_angl[grassAmount];
-
-    for (int i=0; i < grassAmount; i++)
-    {
-        grass_scl[i] = (95 + rand() % 10)/100.0f;
-        grass_angl[i] = (-600 + rand() % 1200)/10.0f;
-    }
-
-    // FLOWER PATCH LETS GOO
-    int flowerAmount = 52;
-    GLfloat flowers_scl[flowerAmount];
-    GLfloat flowers_angl[flowerAmount];
-    GLfloat flowers_pos[flowerAmount*3];
-
-    int z = 9;
-    int fIndex = 0;
-    for (int i=0; i < 4; ++i)
-    {
-        if (i >=2){z-=2;}
-        for (int j=0; j < z; ++j)
-        {
-            flowers_pos[fIndex++] = i*7;
-            flowers_pos[fIndex++] = 0;
-            flowers_pos[fIndex++] = j*7 - (z-1)*3.5;
-
-            if (i > 0)
-            {
-                flowers_pos[fIndex++] = -i*7;
-                flowers_pos[fIndex++] = 0;
-                flowers_pos[fIndex++] = j*7 - (z-1)*3.5;
-            }
-        }
-    }
-
-    for (int i = 0; i < flowerAmount; ++i)
-    {
-        flowers_scl[i] = (95 + rand() % 30)/100.0f;
-        flowers_angl[i] = (-600 + rand() % 1200)/10.0f;
-    }
-
-    // Planting the trees
-    GLfloat oak_pos[9] = {
-        -70.0f,0.0f,-28.0f,
-        63.0f,0.0f,35.0f,
-        35.0f,0.0f,-42.0f
-    };
-    GLfloat oak_scl[3] = {0.5f,1.1f,0.9f};
-    GLfloat oak_angl[3] = {0.0f,63.0f,45.0f};
-
-    GLfloat spruce_pos[6] = {
-        -14.0f,0.0f,21.0f,
-        -63.0f,0.0f,49.0f
-    };
-    GLfloat spruce_scl[2] = {0.9f,1.4f};
-    GLfloat spruce_angl[2] = {0.0f,63.0f};
+    // Generate values from instancing :
+    genInstancingVal();
 
 // Create all of the objects :
 
@@ -355,6 +242,10 @@ int main(void)
     lightcube.cleanup();
     for (int i=0; i < 3;i++){ships[i].cleanup();}
     for (int i=0; i < 4;i++){grass[i].cleanup();}
+    oak.cleanup();
+    spruce.cleanup();
+    flowers.cleanup();
+    flowers2.cleanup();
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
