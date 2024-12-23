@@ -276,12 +276,12 @@ int main(void)
     gltfObj flame;
     flame.init_a();
     flame.init_plmt(glm::vec3(0.0f,-7.0f,228.0f),glm::vec3(3.5*worldScale),glm::vec3(0.0f,0.0f,1.0f),90.0f);
-    flame.init(shaders["obj_def"],shaders["obj_dpth"],20, "../assets/models/dome/flame.gltf", "../assets/textures/dome/flame.png");
+    flame.init(shaders["obj_def"],shaders["obj_dpth"],17, "../assets/models/dome/flame.gltf", "../assets/textures/dome/flame.png");
 
     gltfObj flame2;
     flame2.init_a();
     flame2.init_plmt(glm::vec3(0.0f,-7.0f,-220.0f),glm::vec3(3.5*worldScale),glm::vec3(0.0f,0.0f,1.0f),90.0f);
-    flame2.init(shaders["obj_def"],shaders["obj_dpth"],21, "../assets/models/dome/flame.gltf", "../assets/textures/dome/flame.png");
+    flame2.init(shaders["obj_def"],shaders["obj_dpth"],18, "../assets/models/dome/flame.gltf", "../assets/textures/dome/flame.png");
 
 
 // The two different cameras
