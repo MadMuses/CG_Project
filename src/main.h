@@ -40,7 +40,10 @@ static float worldScale = 10.0f;
 // Boundaries
 static float domeScale      = 15.0f * worldScale;
 static float domeBoundIn    = 11.9f * worldScale;
-static float domeBoundOut   = 17.0f * worldScale;
+static float domeBoundOut   = 20.0f * worldScale;
+
+// Ships bound
+float boundary = 1500;
 
 // Movement variables
 glm::mat4 moveRotationMat;
@@ -108,11 +111,11 @@ std::map<std::string,GLuint> LoadShaders()
 {
     std::map<std::string,GLuint> shaderlist;
 
-    GLuint programID = LoadShadersFromFile("../src/shaders/obj_def.vert", "../src/shaders/obj_def.frag");
-    GLuint depthProgramID = LoadShadersFromFile("../src/shaders/obj_dpth.vert", "../src/shaders/obj_dpth.frag");
-    GLuint shadowProgramID = LoadShadersFromFile("../src/shaders/obj_s.vert", "../src/shaders/obj_s.frag");
-    GLuint instancedshadowProgramID = LoadShadersFromFile("../src/shaders/obj_si.vert", "../src/shaders/obj_s.frag");
-    GLuint depthProgramID_i = LoadShadersFromFile("../src/shaders/obj_dpth_i.vert", "../src/shaders/obj_dpth.frag");
+    GLuint programID = LoadShadersFromFile("../src/shaders/obj/obj_def.vert", "../src/shaders/obj/obj_def.frag");
+    GLuint depthProgramID = LoadShadersFromFile("../src/shaders/obj/obj_dpth.vert", "../src/shaders/obj/obj_dpth.frag");
+    GLuint shadowProgramID = LoadShadersFromFile("../src/shaders/obj/obj_s.vert", "../src/shaders/obj/obj_s.frag");
+    GLuint instancedshadowProgramID = LoadShadersFromFile("../src/shaders/obj/obj_si.vert", "../src/shaders/obj/obj_s.frag");
+    GLuint depthProgramID_i = LoadShadersFromFile("../src/shaders/obj/obj_dpth_i.vert", "../src/shaders/obj/obj_dpth.frag");
 
     if (programID == 0 || depthProgramID == 0 || shadowProgramID == 0 || instancedshadowProgramID == 0 || depthProgramID_i == 0)
     {
@@ -222,8 +225,8 @@ void isOOB(gltfObj ships[6], float bound)
 
 glm::vec3 genShipxzy(float bound){
 
-    int zBound = 1000;
-    int yBound = 1000;
+    int zBound = 800;
+    int yBound = 800;
     int xBound = 1500;
 
     // Generate the new positions
@@ -246,15 +249,14 @@ glm::vec3 genShipxzy(float bound){
 
 void moveShips(gltfObj ships[6], float currentStep)
 {
-    float bound = 1500;
     for(int i = 0; i < 6; i++)
     {
         // Update the ships boolean
-        isOOB(ships,bound);
+        isOOB(ships,boundary);
 
         // Get the entry point for ships OOB
         if (shipsOOB[i]){
-            ships[i].position = genShipxzy(bound);
+            ships[i].position = genShipxzy(boundary);
             shipsOOB[i] = false;
         }
 
@@ -313,6 +315,12 @@ void calcframerate()
     }
 };
 
+// Handle the case where the viewer is in the dome
+bool inDome = true;
+
+// Handle the case where the viewer is in space
+bool inSpace = false;
+
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
 {
     if (action == GLFW_REPEAT || action == GLFW_PRESS)
@@ -321,13 +329,33 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         glm::vec3 dirVect = normalize(glm::vec3(v.x,0,v.z));
         glm::vec3 dirSide = normalize(glm::vec3(cross(up,v).x,0,cross(up,v).z));
 
-        glm::vec3 mvtFB = moveDist * dirVect;
-        glm::vec3 mvtLR = moveDist * dirSide;
+        glm::vec3 mvtFB;
+        glm::vec3 mvtLR;
+
+        if (inDome)
+        {
+            mvtFB = moveDist * dirVect;
+            mvtLR = moveDist * dirSide;
+        }
+        else if (inSpace)
+        {
+            float d = 800 - glm::length(eye_center);
+            float dim = 3*glm::min(1.0f,d / glm::length(eye_center)) ;
+
+            mvtFB = (moveDist*dim) * dirVect;
+            mvtLR = (moveDist*dim) * dirSide;
+        }
+
 
         // Forward
         if (key == GLFW_KEY_Z || key == GLFW_KEY_W)
         {
             if (glm::length(eye_center + mvtFB) < domeBoundIn + tolerance)
+            {
+                eye_center += mvtFB;
+                lookat += mvtFB;
+            }
+            else if (glm::length(eye_center + mvtFB) > domeBoundOut - tolerance)
             {
                 eye_center += mvtFB;
                 lookat += mvtFB;
@@ -340,6 +368,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             {
                 eye_center -= mvtFB;
                 lookat -= mvtFB;
+
+            }else if (glm::length(eye_center - mvtFB) > domeBoundOut - tolerance)
+            {
+                eye_center -= mvtFB;
+                lookat -= mvtFB;
             }
         }
         // Left
@@ -349,6 +382,12 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             {
                 eye_center += mvtLR;
                 lookat += mvtLR;
+
+            }else if (glm::length(eye_center + mvtLR) > domeBoundOut - tolerance)
+            {
+                eye_center += mvtLR;
+                lookat += mvtLR;
+
             }
         }
         // Right
@@ -358,6 +397,39 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             {
                 eye_center -= mvtLR;
                 lookat -= mvtLR;
+
+            }else if (glm::length(eye_center - mvtLR) > domeBoundOut - tolerance)
+            {
+                eye_center -= mvtLR;
+                lookat -= mvtLR;
+
+            }
+        }
+
+        // Get in or out of the dome
+        if (key == GLFW_KEY_E && glm::length(eye_center - glm::vec3(150.0f,20.0f,0.0f)) < 70.0f)
+        {
+            if (inDome)
+            {
+                inSpace = true;
+
+                // Put the viewer in the dome
+                eye_center = glm::vec3(domeBoundOut + 20.0f,20.0f,0.0f);
+                lookat = glm::vec3(domeBoundOut + 20.0f + 100.0f,20.0f,0.0f);
+
+                inDome = false;
+            }
+            else{
+                if (inSpace)
+                {
+                    inDome = true;
+
+                    // Put the viewer in the dome
+                    eye_center = glm::vec3(domeBoundIn - 20.0f,20.0f,0.0f);
+                    lookat = glm::vec3(domeBoundIn - 20.0f - 100.0f,20.0f,0.0f);
+
+                    inSpace = false;
+                }
             }
         }
 
