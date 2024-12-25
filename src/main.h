@@ -43,13 +43,25 @@ static float domeBoundIn    = 11.9f * worldScale;
 static float domeBoundOut   = 20.0f * worldScale;
 
 // Ships bound
-float boundary = 1500;
+float boundary = 1500*3;
+
+//---- Managing movement consequences ----
 
 // Movement variables
 glm::mat4 moveRotationMat;
 GLfloat moveDist    = 0.1f * worldScale;
 GLfloat moveAngle   = glm::radians(3.0f);
 GLfloat tolerance   = 10.0f;
+
+// Handle the case where the viewer is in the dome
+bool inDome = true;
+
+// Handle the case where the viewer is in space
+bool inSpace = false;
+
+// Skybox scale modifier
+float skyboxSclMod = 1.0f;
+float domeSclMod = 1.0f;
 
 //---- Base openGL things ----
 
@@ -64,7 +76,7 @@ static glm::vec3 lookat     (0.0f, 0.0f, 100.0f);
 static glm::vec3 up         (0.0f, 1.0f, 0.0f);
 static float FoV    = 60.0f;
 static float zNear  = 10.0f;
-static float zFar   = 3500.0f;
+static float zFar   = 3*boundary;
 
 //---- Shaders ----
 
@@ -189,7 +201,7 @@ void prepShips(std::map<std::string,GLuint> shaders, gltfObj ships[6],int blockB
         std::string texturePath = "../assets/textures/ships/" + names[i] + ".png";
 
         ships[i].init_s();
-        ships[i].init_plmt(glm::vec3(-3000.0f,0.0f,0.0f),glm::vec3(worldScale*scales[i]),glm::vec3(0.0f,1.0f,0.0f),rot[i]);
+        ships[i].init_plmt(glm::vec3(-2*boundary,0.0f,0.0f),glm::vec3(worldScale*scales[i]),glm::vec3(0.0f,1.0f,0.0f),rot[i]);
         ships[i].init(shaders["obj_def"],shaders["obj_dpth"],i + blockBindFloor,modelPath.c_str(), texturePath.c_str());
     }
     for (int i = 3; i < 6; ++i)
@@ -198,7 +210,7 @@ void prepShips(std::map<std::string,GLuint> shaders, gltfObj ships[6],int blockB
         std::string texturePath = "../assets/textures/ships/" + names[i-3] + ".png";
 
         ships[i].init_s();
-        ships[i].init_plmt(glm::vec3(-3000.0f,0.0f,0.0f),glm::vec3(worldScale*scales[i-3]),glm::vec3(0.0f,1.0f,0.0f),rot[i-3]);
+        ships[i].init_plmt(glm::vec3(-2*boundary,0.0f,0.0f),glm::vec3(worldScale*scales[i-3]),glm::vec3(0.0f,1.0f,0.0f),rot[i-3]);
         ships[i].init(shaders["obj_def"],shaders["obj_dpth"],i + blockBindFloor,modelPath.c_str(), texturePath.c_str());
     }
 }
@@ -225,9 +237,9 @@ void isOOB(gltfObj ships[6], float bound)
 
 glm::vec3 genShipxzy(float bound){
 
-    int zBound = 800;
-    int yBound = 800;
-    int xBound = 1500;
+    int zBound = bound/2;
+    int yBound = bound/2;
+    int xBound = bound;
 
     // Generate the new positions
     int y = 0 + rand() % yBound;
@@ -315,15 +327,6 @@ void calcframerate()
     }
 };
 
-// Handle the case where the viewer is in the dome
-bool inDome = true;
-
-// Handle the case where the viewer is in space
-bool inSpace = false;
-
-// Skybox scale modifier
-float skyboxSclMod = 1.0f;
-
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
 {
     if (action == GLFW_REPEAT || action == GLFW_PRESS)
@@ -343,10 +346,12 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         else if (inSpace)
         {
             float d = glm::length(eye_center);
-            float dim = glm::min(1.0f,(800-d) / d);
+            float dim = glm::min(1.0f,(boundary*0.6f-d) / d);
 
-            skyboxSclMod = 1.0f + (1-dim)*0.5;
+            std::cout << dim << std::endl;
 
+            skyboxSclMod = 1.0f + (1-dim)*0.75;
+            domeSclMod = dim;
 
             mvtFB = (moveDist*dim) * dirVect;
             mvtLR = (moveDist*dim) * dirSide;

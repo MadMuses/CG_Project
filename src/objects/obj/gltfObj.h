@@ -1,10 +1,21 @@
 #include <glad/gl.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
+
+#include <render/shader.h>
+
 #include <vector>
+#include <iostream>
+
+#include <math.h>
+#include <iomanip>
 
 // Other relevant structs
 #include "../commonStructs.h"
+
 #include "helpers.h"
 
 #ifndef GLTFOBJ_H
@@ -19,9 +30,9 @@ struct gltfObj {
     // Methods
 
     // Base use fonctions
-
     void init_s();
     void init_a();
+    void init_plmt_mod(GLfloat posMod = 1.0f,GLfloat scaleMod = 1.0f);
     void init_plmt(glm::vec3 position, glm::vec3 scale, glm::vec3 rotationAxis,GLfloat rotationAngle);
     void init_i(GLuint amount, GLfloat *pos_i, GLfloat *scale_i, GLfloat *rotAngl_i);
 
@@ -61,7 +72,7 @@ struct gltfObj {
     void drawModel(const std::vector<PrimitiveObject>& primitiveObjects, tinygltf::Model &model);
 
     // helpers functions
-    void genModelMat();
+    void genModelMat(glm::vec3 position,glm::vec3 scale);
     int findKeyframeIndex(const std::vector<float>& times, float animationTime);
 
     // Variables
@@ -76,6 +87,10 @@ struct gltfObj {
     glm::vec3 scale = glm::vec3(1.0f);
     glm::vec3 rotationAxis = glm::vec3(0.0f);
     GLfloat rotationAngle = 0.0f;
+
+    // Mod values
+    GLfloat posMod = 1.0f;
+    GLfloat scaleMod = 1.0f;
 
     // Shader variable IDs
     GLuint blockBindID;

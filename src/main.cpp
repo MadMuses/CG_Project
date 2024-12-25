@@ -219,7 +219,7 @@ int main(void)
 
     // initializing objects
     lightcube.initialize(lightPosition);
-    skybox.initialize(glm::vec3(worldScale*100));
+    skybox.initialize(glm::vec3(boundary*0.6));
 
     // Static Obj : Grass blocks
     // Grass elements
@@ -340,6 +340,18 @@ int main(void)
         skybox.render(vp, glm::vec3(skybox.scale*skyboxSclMod));
         lightcube.render(vp,lightPosition);
 
+        // Change the mod values if we are far in space
+
+        dome.init_plmt_mod(domeSclMod, domeSclMod);
+        flowers.init_plmt_mod(domeSclMod, domeSclMod);
+        flowers2.init_plmt_mod(domeSclMod, domeSclMod);
+        for (int i =0; i < 4; i++){grass[i].init_plmt_mod(domeSclMod, domeSclMod);}
+        oak.init_plmt_mod(domeSclMod, domeSclMod);
+        spruce.init_plmt_mod(domeSclMod, domeSclMod);
+        flame.init_plmt_mod(domeSclMod, domeSclMod);
+        flame2.init_plmt_mod(domeSclMod, domeSclMod);
+
+        // Classic render
         dome.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
         flowers.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
@@ -349,6 +361,10 @@ int main(void)
         oak.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
         spruce.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
+        // Render the flame
+        flame.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+        flame2.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+
         // Render and move ships
         moveShips(ships, 0.5f);
         for (int i =0; i < 6; i++)
@@ -356,9 +372,6 @@ int main(void)
             ships[i].render(vp,lightPosition,lightIntensity,lvp,depthTexture);
         }
 
-        // Render the flame
-        flame.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
-        flame2.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
         // Count number of frames over a few seconds and take average
         calcframerate();

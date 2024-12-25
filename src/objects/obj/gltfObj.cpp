@@ -1,19 +1,4 @@
-#include <glad/gl.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include <tiny_gltf.h>
-
-#include <render/shader.h>
-
-#include <vector>
-#include <iostream>
-
-#include <math.h>
-#include <iomanip>
-
 #include "gltfObj.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -389,7 +374,7 @@ void gltfObj::init(GLuint programID, GLuint depthProgramID, int blockBindID, con
 	if (!instancingON)
 	{
 		modelMat = new glm::mat4[instanced];
-		genModelMat();
+		genModelMat(position,scale);
 	}
 
 	// Prepare materials for meshes
@@ -459,6 +444,13 @@ void gltfObj::init_plmt(glm::vec3 position, glm::vec3 scale, glm::vec3 rotationA
 	this -> rotationAngle = rotationAngle;
 }
 
+void gltfObj::init_plmt_mod(GLfloat posMod,GLfloat scaleMod)
+{
+	// Basic transforms
+	this -> posMod = posMod;
+	this -> scaleMod = scaleMod;
+}
+
 void gltfObj::init_s()
 {
 	// Setting up variables
@@ -483,7 +475,7 @@ void gltfObj::init_i(GLuint amount, GLfloat *pos_i, GLfloat *scale_i, GLfloat *r
 
 	// Getting the model matrix for each instance
 	modelMat = new glm::mat4[amount];
-	genModelMat();
+	genModelMat(position,scale);
 
 	// Putting the data in the buffers
 	glGenBuffers(1, &i_modelMatBuffer);
@@ -491,7 +483,7 @@ void gltfObj::init_i(GLuint amount, GLfloat *pos_i, GLfloat *scale_i, GLfloat *r
 	glBufferData(GL_ARRAY_BUFFER, instanced * sizeof(glm::mat4), &modelMat[0], GL_DYNAMIC_DRAW);
 }
 
-void gltfObj::genModelMat()
+void gltfObj::genModelMat(glm::vec3 position,glm::vec3 scale)
 {
 	if (instancingON)
 	{
@@ -523,7 +515,8 @@ void gltfObj::depthRender(glm::mat4 lightViewMatrix) {
 	// Set transforms
 
 	// Change the data of the model matrix(es)
-	genModelMat();
+	genModelMat(position*posMod,scale*scaleMod);
+
 	if (instancingON)
 	{
 		// Set camera
@@ -554,7 +547,7 @@ void gltfObj::render(glm::mat4 cameraMatrix, glm::vec3 lightPosition,glm::vec3 l
 	glUseProgram(programID);
 
 	// Change the data of the model matrix(es)
-	genModelMat();
+	genModelMat(position*posMod,scale*scaleMod);
 
 	if (instancingON)
 	{
