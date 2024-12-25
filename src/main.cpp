@@ -337,7 +337,7 @@ int main(void)
         viewMatrix = glm::lookAt(eye_center, lookat, up);
         glm::mat4 vp = projectionMatrix * viewMatrix;
 
-        skybox.render(vp);
+        skybox.render(vp, glm::vec3(skybox.scale*skyboxSclMod));
         lightcube.render(vp,lightPosition);
 
         dome.render(vp,lightPosition,lightIntensity,lvp,depthTexture);

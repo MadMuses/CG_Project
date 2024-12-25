@@ -60,7 +60,7 @@ void Skybox::initialize(glm::vec3 scale,glm::vec3 position ) {
 	glBindVertexArray(0);
 }
 
-void Skybox::render(glm::mat4 cameraMatrix) {
+void Skybox::render(glm::mat4 cameraMatrix, glm::vec3 scale) {
 	glUseProgram(programID);
 	glBindVertexArray(vertexArrayID);
 

@@ -64,7 +64,7 @@ static glm::vec3 lookat     (0.0f, 0.0f, 100.0f);
 static glm::vec3 up         (0.0f, 1.0f, 0.0f);
 static float FoV    = 60.0f;
 static float zNear  = 10.0f;
-static float zFar   = 3000.0f;
+static float zFar   = 3500.0f;
 
 //---- Shaders ----
 
@@ -321,6 +321,9 @@ bool inDome = true;
 // Handle the case where the viewer is in space
 bool inSpace = false;
 
+// Skybox scale modifier
+float skyboxSclMod = 1.0f;
+
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
 {
     if (action == GLFW_REPEAT || action == GLFW_PRESS)
@@ -339,8 +342,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
         else if (inSpace)
         {
-            float d = 800 - glm::length(eye_center);
-            float dim = 3*glm::min(1.0f,d / glm::length(eye_center)) ;
+            float d = glm::length(eye_center);
+            float dim = glm::min(1.0f,(800-d) / d);
+
+            skyboxSclMod = 1.0f + (1-dim)*0.5;
+
 
             mvtFB = (moveDist*dim) * dirVect;
             mvtLR = (moveDist*dim) * dirSide;

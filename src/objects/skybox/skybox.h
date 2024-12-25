@@ -9,7 +9,7 @@
 struct Skybox {
 
 	void initialize(glm::vec3 scale = glm::vec3(1.0f),glm::vec3 position = glm::vec3(0.0f));
-	void render(glm::mat4 cameraMatrix);
+	void render(glm::mat4 cameraMatrix, glm::vec3 scale);
 	void cleanup();
 
 	// All transforms
