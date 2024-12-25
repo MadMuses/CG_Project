@@ -150,9 +150,9 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":240,
+			"count":255,
 			"max":[
-				0.502377986907959,
+				1.215745210647583,
 				0.3572058081626892,
 				1.8080397844314575
 			],
@@ -166,37 +166,37 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":240,
+			"count":255,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":240,
+			"count":255,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5121,
-			"count":240,
+			"count":255,
 			"type":"VEC4"
 		},
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":240,
+			"count":255,
 			"type":"VEC4"
 		},
 		{
 			"bufferView":5,
 			"componentType":5123,
-			"count":354,
+			"count":378,
 			"type":"SCALAR"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":4684,
+			"count":4666,
 			"max":[
 				1.2520029544830322,
 				1.102007269859314,
@@ -212,31 +212,31 @@
 		{
 			"bufferView":7,
 			"componentType":5126,
-			"count":4684,
+			"count":4666,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":8,
 			"componentType":5126,
-			"count":4684,
+			"count":4666,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":9,
 			"componentType":5121,
-			"count":4684,
+			"count":4666,
 			"type":"VEC4"
 		},
 		{
 			"bufferView":10,
 			"componentType":5126,
-			"count":4684,
+			"count":4666,
 			"type":"VEC4"
 		},
 		{
 			"bufferView":11,
 			"componentType":5123,
-			"count":7134,
+			"count":7098,
 			"type":"SCALAR"
 		},
 		{
@@ -295,121 +295,121 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":2880,
+			"byteLength":3060,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":2880,
-			"byteOffset":2880,
+			"byteLength":3060,
+			"byteOffset":3060,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":1920,
-			"byteOffset":5760,
+			"byteLength":2040,
+			"byteOffset":6120,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":960,
-			"byteOffset":7680,
+			"byteLength":1020,
+			"byteOffset":8160,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":3840,
-			"byteOffset":8640,
+			"byteLength":4080,
+			"byteOffset":9180,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":708,
-			"byteOffset":12480,
+			"byteLength":756,
+			"byteOffset":13260,
 			"target":34963
 		},
 		{
 			"buffer":0,
-			"byteLength":56208,
-			"byteOffset":13188,
+			"byteLength":55992,
+			"byteOffset":14016,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":56208,
-			"byteOffset":69396,
+			"byteLength":55992,
+			"byteOffset":70008,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":37472,
-			"byteOffset":125604,
+			"byteLength":37328,
+			"byteOffset":126000,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":18736,
-			"byteOffset":163076,
+			"byteLength":18664,
+			"byteOffset":163328,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":74944,
-			"byteOffset":181812,
+			"byteLength":74656,
+			"byteOffset":181992,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":14268,
-			"byteOffset":256756,
+			"byteLength":14196,
+			"byteOffset":256648,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":204,
-			"byteOffset":271024,
+			"byteOffset":270844,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":204,
-			"byteOffset":271228,
+			"byteOffset":271048,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":136,
-			"byteOffset":271432,
+			"byteOffset":271252,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":68,
-			"byteOffset":271568,
+			"byteOffset":271388,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":272,
-			"byteOffset":271636,
+			"byteOffset":271456,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":90,
-			"byteOffset":271908,
+			"byteOffset":271728,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":64,
-			"byteOffset":272000
+			"byteOffset":271820
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":272064,
+			"byteLength":271884,
 			"uri":"dome.bin"
 		}
 	]
