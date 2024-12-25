@@ -215,6 +215,9 @@ int main(void)
     // Static object : The dome
     gltfObj dome;
 
+    // Static object : Doors
+    gltfObj door;
+
 // Initialise objects :
 
     // initializing objects
@@ -270,6 +273,11 @@ int main(void)
     dome.init_plmt(glm::vec3(0.0f),glm::vec3(domeScale),glm::vec3(0.0f,1.0f,0.0f),0.0f);
     dome.init(shaders["obj_s"],shaders["obj_dpth"],9,"../assets/models/dome/dome.gltf", NULL);
 
+    // Doors
+    door.init_s();
+    door.init_plmt(glm::vec3(182.0f,0.0f,22.5f),glm::vec3(25.0f,25.0f,50.0f),glm::vec3(0.0f,1.0f,0.0f),0.0f);
+    door.init(shaders["obj_s"],shaders["obj_dpth"],20,"../assets/models/dome/door.gltf", NULL);
+
     // Ships
     prepShips(shaders,ships,10);
 
@@ -305,6 +313,7 @@ int main(void)
         glm::mat4 lvp = lightProjectionMatrix * lightViewMatrix;
 
         dome.depthRender(lvp);
+        door.depthRender(lvp);
 
         flowers.depthRender(lvp);
         flowers2.depthRender(lvp);
@@ -372,6 +381,20 @@ int main(void)
             ships[i].render(vp,lightPosition,lightIntensity,lvp,depthTexture);
         }
 
+        // Handling door opening/closing
+        if (glm::length(eye_center - glm::vec3(150.0f,20.0f,0.0f)) < 70.0f&& door.position.y > -30.0f)
+        {
+            door.position.y -= 0.1f;
+        }else
+        {
+            if (door.position.y < 0.0f)
+            {
+                door.position.y += 0.1f;
+            }
+        }
+
+        // Render the door
+        door.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
         // Count number of frames over a few seconds and take average
         calcframerate();

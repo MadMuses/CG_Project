@@ -108,7 +108,7 @@ static float depthFar   = 400.0f;
 
 // Animation
 static bool playAnimation = true;
-static float playbackSpeed = 0.5f;
+static float playbackSpeed = 1.5f;
 
 // FPS tracking
 float deltaTime;
