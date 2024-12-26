@@ -14,6 +14,14 @@
 #include <iomanip>
 #include <render/shader.h>
 
+//------------------------------------------------------------------//
+//																	//
+//		This file lists all the functions that can (or are)         //
+//  used in multiple files. Both print methods are here for         //
+//  debug purposes only.                                            //
+//																	//
+//------------------------------------------------------------------//
+
 void printVec(glm::vec3 v);
 void printMat(glm::mat4 v);
 GLuint LoadTextureTileBox(const char *texture_file_path);

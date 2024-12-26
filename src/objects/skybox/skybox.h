@@ -6,6 +6,14 @@
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
+//------------------------------------------------------------------//
+//																	//
+//		This structure allows you to create a skybox object			//
+//		Shaders path are implemented inside "initialize" if			//
+//		they need to be changed.									//
+//																	//
+//------------------------------------------------------------------//
+
 struct Skybox {
 
 	void initialize(glm::vec3 scale = glm::vec3(1.0f),glm::vec3 position = glm::vec3(0.0f));
@@ -22,10 +30,11 @@ struct Skybox {
 	GLuint indexBufferID;
 	GLuint colorBufferID;
 	GLuint uvBufferID;
+	GLuint samplerIndex_buffer_ID;
 
-	// Handling textures
-	GLuint textureIDs[6];
-	GLuint textureSamplerIDs[6];
+	// Handling textures (One texture/sampler per face)
+	GLuint textureIDs[6];			// All the loaded textures
+	GLuint textureSamplerIDs[6];	// All the texture samplers IDs
 
 	// Render var ID
 	GLuint mvpMatrixID;
@@ -33,7 +42,8 @@ struct Skybox {
 	// Shader variable IDs
 	GLuint programID;
 
-	const char* texturePaths[6] = {
+	// Data
+	const char* texturePaths[6] = {		// Path to the starbox texture
 		"../assets/textures/starbox/starbox_front.png",
 		"../assets/textures/starbox/starbox_back.png",
 		"../assets/textures/starbox/starbox_right.png",
@@ -42,8 +52,7 @@ struct Skybox {
 		"../assets/textures/starbox/starbox_up.png"
 	};
 
-	GLuint samplerIndex_buffer_ID;
-	GLfloat samplerIndex_buffer_data [24] = {
+	GLfloat samplerIndex_buffer_data [24] = {	// Tells which texture is used per vertex
 		0.0, 0.0, 0.0, 0.0,
 		1.0, 1.0, 1.0, 1.0,
 		2.0, 2.0, 2.0, 2.0,

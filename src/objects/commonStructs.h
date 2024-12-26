@@ -3,6 +3,16 @@
 #include <glm/gtx/string_cast.hpp>
 #include <vector>
 
+//------------------------------------------------------------------//
+//																	//
+//		This file contain a list of all the common structure        //
+//  used by the gltfObj structure. They could be integrated in      //
+//  the gltfObj.h file but are here for clarity and potential       //
+//  future integration purposes.                                    //
+//																	//
+//------------------------------------------------------------------//
+
+
 #ifndef COMMONSTRUCTS_H
 #define COMMONSTRUCTS_H
 
