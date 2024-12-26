@@ -123,13 +123,14 @@ std::map<std::string,GLuint> LoadShaders()
 {
     std::map<std::string,GLuint> shaderlist;
 
+    GLuint nolightID = LoadShadersFromFile("../src/shaders/obj/obj_nl.vert", "../src/shaders/obj/obj_nl.frag");
     GLuint programID = LoadShadersFromFile("../src/shaders/obj/obj_def.vert", "../src/shaders/obj/obj_def.frag");
     GLuint depthProgramID = LoadShadersFromFile("../src/shaders/obj/obj_dpth.vert", "../src/shaders/obj/obj_dpth.frag");
     GLuint shadowProgramID = LoadShadersFromFile("../src/shaders/obj/obj_s.vert", "../src/shaders/obj/obj_s.frag");
     GLuint instancedshadowProgramID = LoadShadersFromFile("../src/shaders/obj/obj_si.vert", "../src/shaders/obj/obj_s.frag");
     GLuint depthProgramID_i = LoadShadersFromFile("../src/shaders/obj/obj_dpth_i.vert", "../src/shaders/obj/obj_dpth.frag");
 
-    if (programID == 0 || depthProgramID == 0 || shadowProgramID == 0 || instancedshadowProgramID == 0 || depthProgramID_i == 0)
+    if (programID == 0 || depthProgramID == 0 || shadowProgramID == 0 || instancedshadowProgramID == 0 || depthProgramID_i == 0 || nolightID == 0)
     {
         std::cerr << "Failed to load shaders." << std::endl;
     }
@@ -138,6 +139,7 @@ std::map<std::string,GLuint> LoadShaders()
     shaderlist["obj_s"] = shadowProgramID;
     shaderlist["obj_si"] = instancedshadowProgramID;
     shaderlist["obj_dpth_i"] = depthProgramID_i;
+    shaderlist["obj_nl"] = nolightID;
 
     return shaderlist;
 }
@@ -347,9 +349,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         {
             float d = glm::length(eye_center);
             float dim = glm::min(1.0f,(boundary*0.6f-d) / d);
-
-            std::cout << dim << std::endl;
-
+            
             skyboxSclMod = 1.0f + (1-dim)*0.75;
             domeSclMod = dim;
 
@@ -418,7 +418,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
 
         // Get in or out of the dome
-        if (key == GLFW_KEY_E && glm::length(eye_center - glm::vec3(150.0f,20.0f,0.0f)) < 70.0f)
+        if (key == GLFW_KEY_E && glm::length(eye_center - glm::vec3(160.0f,20.0f,0.0f)) < 70.0f)
         {
             if (inDome)
             {

@@ -274,9 +274,8 @@ int main(void)
     dome.init(shaders["obj_s"],shaders["obj_dpth"],9,"../assets/models/dome/dome.gltf", NULL);
 
     // Doors
-    door.init_s();
-    door.init_plmt(glm::vec3(182.0f,0.0f,22.5f),glm::vec3(25.0f,25.0f,50.0f),glm::vec3(0.0f,1.0f,0.0f),0.0f);
-    door.init(shaders["obj_s"],shaders["obj_dpth"],20,"../assets/models/dome/door.gltf", NULL);
+    door.init_plmt(glm::vec3(182.0f,0.0f,-12.5f),glm::vec3(25.0f,25.0f,50.0f),glm::vec3(0.0f,1.0f,0.0f),180.0f);
+    door.init(shaders["obj_nl"],shaders["obj_dpth"],20,"../assets/models/dome/door.gltf", "../assets/textures/dome/door.png");
 
     // Ships
     prepShips(shaders,ships,10);
@@ -290,6 +289,12 @@ int main(void)
     flame2.init_a();
     flame2.init_plmt(glm::vec3(0.0f,-7.0f,-220.0f),glm::vec3(3.5*worldScale),glm::vec3(0.0f,0.0f,1.0f),90.0f);
     flame2.init(shaders["obj_def"],shaders["obj_dpth"],18, "../assets/models/dome/flame.gltf", "../assets/textures/dome/flame.png");
+
+    // Create robot
+    gltfObj robot;
+    robot.init_a();
+    robot.init_plmt(glm::vec3(126.0f,3.0f,-31.5f),glm::vec3(worldScale),glm::vec3(0.0f,1.0f,0.0f),-60.0f);
+    robot.init(shaders["obj_s"],shaders["obj_dpth"],19,"../assets/models/bot/botorobot.gltf", NULL);
 
 
 // The two different cameras
@@ -313,7 +318,7 @@ int main(void)
         glm::mat4 lvp = lightProjectionMatrix * lightViewMatrix;
 
         dome.depthRender(lvp);
-        door.depthRender(lvp);
+        robot.depthRender(lvp);
 
         flowers.depthRender(lvp);
         flowers2.depthRender(lvp);
@@ -350,8 +355,9 @@ int main(void)
         lightcube.render(vp,lightPosition);
 
         // Change the mod values if we are far in space
-
         dome.init_plmt_mod(domeSclMod, domeSclMod);
+        door.init_plmt_mod(domeSclMod, domeSclMod);
+
         flowers.init_plmt_mod(domeSclMod, domeSclMod);
         flowers2.init_plmt_mod(domeSclMod, domeSclMod);
         for (int i =0; i < 4; i++){grass[i].init_plmt_mod(domeSclMod, domeSclMod);}
@@ -359,6 +365,7 @@ int main(void)
         spruce.init_plmt_mod(domeSclMod, domeSclMod);
         flame.init_plmt_mod(domeSclMod, domeSclMod);
         flame2.init_plmt_mod(domeSclMod, domeSclMod);
+        robot.init_plmt_mod(domeSclMod, domeSclMod);
 
         // Classic render
         dome.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
@@ -374,6 +381,9 @@ int main(void)
         flame.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
         flame2.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
+        // Render the bot
+        robot.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+
         // Render and move ships
         moveShips(ships, 0.5f);
         for (int i =0; i < 6; i++)
@@ -382,7 +392,7 @@ int main(void)
         }
 
         // Handling door opening/closing
-        if (glm::length(eye_center - glm::vec3(150.0f,20.0f,0.0f)) < 70.0f&& door.position.y > -30.0f)
+        if (glm::length(eye_center - glm::vec3(160.0f,20.0f,0.0f)) < 70.0f&& door.position.y > -30.0f)
         {
             door.position.y -= 0.1f;
         }else
@@ -403,6 +413,7 @@ int main(void)
             thetime += deltaTime * playbackSpeed;
             flame.update(thetime);
             flame2.update(thetime);
+            robot.update(thetime);
         }
 
         // Swap buffers
