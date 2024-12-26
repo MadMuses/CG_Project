@@ -9,6 +9,7 @@ gltfObj::~gltfObj() {
 	cleanup();
 }
 
+// Get node transforms from node
 glm::mat4 gltfObj::getNodeTransform(const tinygltf::Node& node) {
 	glm::mat4 transform(1.0f);
 
@@ -29,14 +30,11 @@ glm::mat4 gltfObj::getNodeTransform(const tinygltf::Node& node) {
 	return transform;
 }
 
+// Compute local transforms and fill it with the node transforms
 void gltfObj::computeLocalNodeTransform(const tinygltf::Model& model,
 	int nodeIndex,
 	std::vector<glm::mat4> &localTransforms)
 {
-	// ---------------------------------------
-	// TODO: your code here
-	// ----------------------------------------
-
 	const tinygltf::Node &node = model.nodes[nodeIndex];
 	localTransforms[nodeIndex] = getNodeTransform(node);
 
@@ -44,28 +42,22 @@ void gltfObj::computeLocalNodeTransform(const tinygltf::Model& model,
 	{
 		computeLocalNodeTransform(model, childIndex,localTransforms);
 	};
-
-	// ---------------------------------------
 }
 
+// Compute global transforms and fill it with the node transforms
 void gltfObj::computeGlobalNodeTransform(const tinygltf::Model& model,
 	const std::vector<glm::mat4> &localTransforms,
 	int nodeIndex, const glm::mat4& parentTransform,
 	std::vector<glm::mat4> &globalTransforms)
 {
-	// ----------------------------------------
-	// TODO: your code here
-	// ----------------------------------------
-
 	globalTransforms[nodeIndex] = parentTransform * localTransforms[nodeIndex];
 
 	for (const int childIndex : model.nodes[nodeIndex].children) {
 		computeGlobalNodeTransform(model, localTransforms, childIndex,globalTransforms[nodeIndex],globalTransforms);
 	};
-
-	// ----------------------------------------
 }
 
+// Create the skinObject vector and fill it with the created skin objects
 std::vector<SkinObject> gltfObj::prepareSkinning(const tinygltf::Model &model) {
 	std::vector<SkinObject> skinObjects;
 
@@ -96,9 +88,7 @@ std::vector<SkinObject> gltfObj::prepareSkinning(const tinygltf::Model &model) {
 		skinObject.globalJointTransforms.resize(skin.joints.size());
 		skinObject.jointMatrices.resize(skin.joints.size());
 
-		// ----------------------------------------------
-		// TODO: your code here to compute joint matrices
-		// ----------------------------------------------
+		// Compute joint matrices
 
 		// Get the root node
 		int rootNodeIndex = skin.joints[0];
@@ -111,19 +101,19 @@ std::vector<SkinObject> gltfObj::prepareSkinning(const tinygltf::Model &model) {
 		computeGlobalNodeTransform(model, localNodeTransforms, rootNodeIndex,glm::mat4(1.0f),
 			skinObject.globalJointTransforms);
 
-		// Calculate the jointmatrices
+		// Calculate the joint matrices
 		for (size_t h = 0; h < skinObject.jointMatrices.size(); h++)
 		{
 			int nodeIndex = skin.joints[h];
 			skinObject.jointMatrices[h] = skinObject.globalJointTransforms[nodeIndex] * skinObject.inverseBindMatrices[h];
 		}
-		// ----------------------------------------------
 
 		skinObjects.push_back(skinObject);
 	}
 	return skinObjects;
 }
 
+// Load the model
 bool gltfObj::loadModel(tinygltf::Model &model, const char *filename) {
 	tinygltf::TinyGLTF loader;
 	std::string err;
@@ -146,6 +136,7 @@ bool gltfObj::loadModel(tinygltf::Model &model, const char *filename) {
 	return res;
 }
 
+// Get material from model and push it to the materialObjects vector
 std::vector<MaterialObject> gltfObj::bindMaterials(tinygltf::Model &model)
 {
 	std::vector<MaterialObject> materialObjects;
@@ -167,6 +158,7 @@ std::vector<MaterialObject> gltfObj::bindMaterials(tinygltf::Model &model)
 	return materialObjects;
 };
 
+// Generate vbos and vaas according to the model
 void gltfObj::bindMesh(std::vector<PrimitiveObject> &primitiveObjects,
 			tinygltf::Model &model, tinygltf::Mesh &mesh) {
 
@@ -255,6 +247,7 @@ void gltfObj::bindMesh(std::vector<PrimitiveObject> &primitiveObjects,
 	}
 }
 
+// Bind mesh of every node
 void gltfObj::bindModelNodes(std::vector<PrimitiveObject> &primitiveObjects,
 					tinygltf::Model &model,
 					tinygltf::Node &node) {
@@ -300,6 +293,7 @@ void gltfObj::drawMesh(const std::vector<PrimitiveObject> &primitiveObjects,
 			glBindBuffer(GL_ARRAY_BUFFER, i_modelMatBuffer);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, instanced * sizeof(glm::mat4), &modelMat[0]);
 
+			// We use 4 indexes because the maximum amount of possible data per index is 4 (vec4), it will still be received as mat4 in 5
 			glEnableVertexAttribArray(5);
 			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * rowSize, (void*)0);
 
@@ -312,6 +306,7 @@ void gltfObj::drawMesh(const std::vector<PrimitiveObject> &primitiveObjects,
 			glEnableVertexAttribArray(8);
 			glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * rowSize, (void*)(3 * rowSize));
 
+			// This tells us that each matrix will be used for each instance
 			glVertexAttribDivisor(5, 1);
 			glVertexAttribDivisor(6, 1);
 			glVertexAttribDivisor(7, 1);
@@ -321,12 +316,14 @@ void gltfObj::drawMesh(const std::vector<PrimitiveObject> &primitiveObjects,
 		tinygltf::Primitive primitive = mesh.primitives[i];
 		tinygltf::Accessor indexAccessor = model.accessors[primitive.indices];
 
+		// Send material info
 		glUniform4fv(materialUniID, 1, &primitiveObjects[i].material.BaseColorFactor[0]);
 		glUniform1fv(metallicUniID, 1, &primitiveObjects[i].material.MetallicFactor);
 		glUniform1fv(roughnessUniID, 1, &primitiveObjects[i].material.RoughnessFactor);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos.at(indexAccessor.bufferView));
 
+		// Draw with instancing if there is, draws normally if not
 		if (instancingON)
 		{
 			glDrawElementsInstanced(primitive.mode, indexAccessor.count,
@@ -417,6 +414,7 @@ void gltfObj::init(GLuint programID, GLuint depthProgramID, int blockBindID, con
 	glUniformBlockBinding(programID, ubo_jointMatricesID, blockBindID);  // 0 est le binding point du UBO
 	glBindBufferBase(GL_UNIFORM_BUFFER, blockBindID, jointMatricesID);
 
+	// If shadows are enables, allocate the necessary resources
 	if (shadowsON)
 	{
 		// Setting up variables
@@ -428,6 +426,8 @@ void gltfObj::init(GLuint programID, GLuint depthProgramID, int blockBindID, con
 		// Handle for variables
 		lvpMatrixID = glGetUniformLocation(programID, "LVP");
 	}
+
+	// Creates the necessary animating elements if they are enabled
 	if (animationON)
 	{
 		// Prepare animation data
@@ -435,6 +435,7 @@ void gltfObj::init(GLuint programID, GLuint depthProgramID, int blockBindID, con
 	}
 }
 
+// Init the position,scale,rotation angle and axis, must be used first, NECESSARY
 void gltfObj::init_plmt(glm::vec3 position, glm::vec3 scale, glm::vec3 rotationAxis,GLfloat rotationAngle)
 {
 	// Basic transforms
@@ -444,6 +445,7 @@ void gltfObj::init_plmt(glm::vec3 position, glm::vec3 scale, glm::vec3 rotationA
 	this -> rotationAngle = rotationAngle;
 }
 
+// Init modulation factor used for downscaling position and scale with it
 void gltfObj::init_plmt_mod(GLfloat posMod,GLfloat scaleMod)
 {
 	// Basic transforms
@@ -451,17 +453,20 @@ void gltfObj::init_plmt_mod(GLfloat posMod,GLfloat scaleMod)
 	this -> scaleMod = scaleMod;
 }
 
+// Tells the object that shadows are wanted
 void gltfObj::init_s()
 {
 	// Setting up variables
 	this -> shadowsON = true;
 }
 
+// Tells the object it's animation will be played
 void gltfObj::init_a()
 {
 	this -> animationON = true;
 }
 
+// Initialise instancing, expects the offset datas (pos_i, scale_i, rotAngle_i) to be respectively 3*"amount", "amount" and "amount" long to work
 void gltfObj::init_i(GLuint amount, GLfloat *pos_i, GLfloat *scale_i, GLfloat *rotAngl_i)
 {
 	// Setting up variables
@@ -483,6 +488,7 @@ void gltfObj::init_i(GLuint amount, GLfloat *pos_i, GLfloat *scale_i, GLfloat *r
 	glBufferData(GL_ARRAY_BUFFER, instanced * sizeof(glm::mat4), &modelMat[0], GL_DYNAMIC_DRAW);
 }
 
+// Used to generate model matrices using a given position and scale, will create a single matrix in modelMat[0] if there is no instancing
 void gltfObj::genModelMat(glm::vec3 position,glm::vec3 scale)
 {
 	if (instancingON)
@@ -509,6 +515,7 @@ void gltfObj::genModelMat(glm::vec3 position,glm::vec3 scale)
 	}
 }
 
+// Render made to give information to the depth buffer only, will not output visuals, very minimal
 void gltfObj::depthRender(glm::mat4 lightViewMatrix) {
 	glUseProgram(depthProgramID);
 
@@ -542,6 +549,7 @@ void gltfObj::depthRender(glm::mat4 lightViewMatrix) {
 	drawModel(primitiveObjects, model);
 }
 
+// Main render, lightMatrix and depthTexture will not be used if shadows are not activated but are still required
 void gltfObj::render(glm::mat4 cameraMatrix, glm::vec3 lightPosition,glm::vec3 lightIntensity, glm::mat4 lightMatrix, GLuint depthTexture)
 {
 	glUseProgram(programID);
@@ -719,17 +727,13 @@ void gltfObj::updateAnimation(
 		const std::vector<float> &times = animationObject.samplers[channel.sampler].input;
 		float animationTime = fmod(time, times.back());
 
-		// ----------------------------------------------------------
-		// TODO: Find a keyframe for getting animation data
-		// ----------------------------------------------------------
+		// Get animation keyframe
 		int keyframeIndex = findKeyframeIndex(times, animationTime);
 
 		const unsigned char *outputPtr = &outputBuffer.data[outputBufferView.byteOffset + outputAccessor.byteOffset];
 		const float *outputBuf = reinterpret_cast<const float*>(outputPtr);
 
-		// -----------------------------------------------------------
-		// TODO: Add interpolation for smooth animation
-		// -----------------------------------------------------------
+		// Creates interpolated position, scale and rotation changes
 		float t = (animationTime - times[keyframeIndex]) / (times[keyframeIndex+1] - times[keyframeIndex]);
 
 		if (channel.target_path == "translation") {
@@ -759,10 +763,6 @@ void gltfObj::updateAnimation(
 
 void gltfObj::updateSkinning(const std::vector<glm::mat4> &nodeTransforms) {
 
-	// -------------------------------------------------
-	// TODO: Recompute joint matrices
-	// -------------------------------------------------
-
 	for (size_t i = 0; i < model.skins.size(); i++)
 	{
 		const tinygltf::Skin &skin = model.skins[i];
@@ -784,11 +784,6 @@ void gltfObj::updateSkinning(const std::vector<glm::mat4> &nodeTransforms) {
 }
 
 void gltfObj::update(float time) {
-
-	// -------------------------------------------------
-	// TODO: your code here
-	// -------------------------------------------------
-
 	if (model.animations.size() > 0) {
 		const tinygltf::Animation &animation = model.animations[0];
 		const AnimationObject &animationObject = animationObjects[0];

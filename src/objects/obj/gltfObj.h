@@ -21,6 +21,44 @@
 #ifndef GLTFOBJ_H
 #define GLTFOBJ_H
 
+//------------------------------------------------------------------//
+//																	//
+//		This is made to open and display gltf files.                //
+//  This structure can handle raw colors and textures and can be    //
+//  upgraded to implement physic based rendering through new        //
+//  shaders. It can handle instancing and skeletal animation.       //
+//  The only needed functions outside of this struct scope are :    //
+//																	//
+//  Initializing :                                                  //
+//																	//
+//      init_plmt : Must be used first, initialise position,scale   //
+//          and rotation                                            //
+//      init_s : Initialise shadows                                 //
+//      init_a : Initialise animation                               //
+//      init_i : initialise instancing,expects the offset data      //
+//          (pos_i, scale_i, rotAngle_i) to be respectively         //
+//          3*"amount", "amount" and "amount" long to work.         //
+//      init_plmt_mod : factor used for scaling position and scale  //
+//      init : Main initialisation, must be done last.              //
+//																	//
+//  Rendering :                                                     //
+//      depthRender : Render made to give information to the depth  //
+//          buffer only, will not output visuals, very minimal.     //
+//      render :  Main render, lightMatrix and depthTexture will    //
+//          not be used if shadows are not activated but are still  //
+//          required.                                               //
+//																	//
+//  Animating :                                                     //
+//      update : Changes the mesh to the next frame, using current  //
+//          time. (calculation in main)                             //
+//																	//
+//  NB : This struct expects models to have at least one bone.      //
+//       This has only been tested with models from blender with    //
+//          only one mesh                                           //
+//																	//
+//------------------------------------------------------------------//
+
+
 struct gltfObj {
 
     // Constructors
