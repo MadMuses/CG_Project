@@ -31,11 +31,11 @@
 //																	//
 //  Initializing :                                                  //
 //																	//
-//      init_plmt : Must be used first, initialise position,scale   //
+//      init_plmt : Must be used first, initialize position,scale   //
 //          and rotation                                            //
-//      init_s : Initialise shadows                                 //
-//      init_a : Initialise animation                               //
-//      init_i : initialise instancing,expects the offset data      //
+//      init_s : Initialize shadows                                 //
+//      init_a : Initialize animation                               //
+//      init_i : initialize instancing,expects the offset data      //
 //          (pos_i, scale_i, rotAngle_i) to be respectively         //
 //          3*"amount", "amount" and "amount" long to work.         //
 //      init_plmt_mod : factor used for scaling position and scale  //
