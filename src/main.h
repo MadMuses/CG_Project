@@ -28,8 +28,6 @@
 
 // Objects include
 #include "objects/skybox/skybox.h"
-#include "objects/cube/cube.h"
-
 #include "objects/obj/gltfObj.h"
 
 //---- Scaling to make things more simple to follow for me ----
@@ -116,6 +114,10 @@ static double lastTime = glfwGetTime();
 float thetime = 0.0f;			            // Animation time
 float fTime = 0.0f;			                // Time for measuring fps
 unsigned long frames = 0;
+
+//---- Debug ----
+
+bool saveDepth = false;
 
 //---- Methods ----
 

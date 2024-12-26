@@ -24,9 +24,7 @@ add_executable(main
 	src/helpers.cpp
 
 	src/objects/obj/gltfObj.cpp
-
 	src/objects/skybox/skybox.cpp
-	src/objects/cube/cube.cpp
 )
 target_link_libraries(main
 	${OPENGL_LIBRARY}

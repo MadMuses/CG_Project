@@ -1,7 +1,5 @@
 #include "main.h"
 
-bool saveDepth = true;
-
 int main(void)
 {
     // Initalise window and OpenGl functions
@@ -195,7 +193,6 @@ int main(void)
 
     // Basic objects
     Skybox skybox;
-    Cube lightcube;
 
     // Render ships
     gltfObj virgo,gemini,scorpio,virgo1,gemini1,scorpio1;
@@ -221,7 +218,6 @@ int main(void)
 // Initialise objects :
 
     // initializing objects
-    lightcube.initialize(lightPosition);
     skybox.initialize(glm::vec3(boundary*0.6));
 
     // Static Obj : Grass blocks
@@ -352,7 +348,6 @@ int main(void)
         glm::mat4 vp = projectionMatrix * viewMatrix;
 
         skybox.render(vp, glm::vec3(skybox.scale*skyboxSclMod));
-        lightcube.render(vp,lightPosition);
 
         // Change the mod values if we are far in space
         dome.init_plmt_mod(domeSclMod, domeSclMod);
@@ -426,7 +421,14 @@ int main(void)
     // Clean up
     skybox.cleanup();
     dome.cleanup();
-    lightcube.cleanup();
+    flame.cleanup();
+    flame2.cleanup();
+    door.cleanup();
+    flowers.cleanup();
+    robot.cleanup();
+    oak.cleanup();
+    spruce.cleanup();
+
     for (int i=0; i < 6;i++){ships[i].cleanup();}
     for (int i=0; i < 4;i++){grass[i].cleanup();}
 
