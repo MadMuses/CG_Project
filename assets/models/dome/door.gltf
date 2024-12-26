@@ -33,68 +33,20 @@
 			],
 			"name":"Armature",
 			"scale":[
-				0.16055256128311157,
-				0.16055256128311157,
-				0.16055256128311157
-			]
-		}
-	],
-	"animations":[
-		{
-			"channels":[
-				{
-					"sampler":0,
-					"target":{
-						"node":0,
-						"path":"translation"
-					}
-				},
-				{
-					"sampler":1,
-					"target":{
-						"node":0,
-						"path":"rotation"
-					}
-				},
-				{
-					"sampler":2,
-					"target":{
-						"node":0,
-						"path":"scale"
-					}
-				}
-			],
-			"name":"ArmatureAction",
-			"samplers":[
-				{
-					"input":7,
-					"interpolation":"LINEAR",
-					"output":8
-				},
-				{
-					"input":7,
-					"interpolation":"LINEAR",
-					"output":9
-				},
-				{
-					"input":7,
-					"interpolation":"LINEAR",
-					"output":10
-				}
+				0.15262389183044434,
+				0.15262389183044434,
+				0.15262389183044434
 			]
 		}
 	],
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Material.002",
+			"name":"Material.001",
 			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0.800000011920929,
-					0.800000011920929,
-					0.800000011920929,
-					1
-				],
+				"baseColorTexture":{
+					"index":0
+				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
 			}
@@ -102,7 +54,7 @@
 	],
 	"meshes":[
 		{
-			"name":"Cube.002",
+			"name":"Cube.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -116,6 +68,19 @@
 					"material":0
 				}
 			]
+		}
+	],
+	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		}
+	],
+	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"door.png",
+			"uri":"../../../../Models/city/dome/door.png"
 		}
 	],
 	"skins":[
@@ -135,12 +100,12 @@
 			"max":[
 				0.007329209707677364,
 				0.15310901403427124,
-				-0.0017225602641701698
+				0.0010105548426508904
 			],
 			"min":[
 				-0.007329209707677364,
 				0.0012301802635192871,
-				-0.10374366492033005
+				-0.10101054608821869
 			],
 			"type":"VEC3"
 		},
@@ -179,36 +144,6 @@
 			"componentType":5126,
 			"count":1,
 			"type":"MAT4"
-		},
-		{
-			"bufferView":7,
-			"componentType":5126,
-			"count":1,
-			"max":[
-				2.5
-			],
-			"min":[
-				2.5
-			],
-			"type":"SCALAR"
-		},
-		{
-			"bufferView":8,
-			"componentType":5126,
-			"count":1,
-			"type":"VEC3"
-		},
-		{
-			"bufferView":9,
-			"componentType":5126,
-			"count":1,
-			"type":"VEC4"
-		},
-		{
-			"bufferView":10,
-			"componentType":5126,
-			"count":1,
-			"type":"VEC3"
 		}
 	],
 	"bufferViews":[
@@ -252,31 +187,17 @@
 			"buffer":0,
 			"byteLength":64,
 			"byteOffset":1320
-		},
+		}
+	],
+	"samplers":[
 		{
-			"buffer":0,
-			"byteLength":4,
-			"byteOffset":1384
-		},
-		{
-			"buffer":0,
-			"byteLength":12,
-			"byteOffset":1388
-		},
-		{
-			"buffer":0,
-			"byteLength":16,
-			"byteOffset":1400
-		},
-		{
-			"buffer":0,
-			"byteLength":12,
-			"byteOffset":1416
+			"magFilter":9729,
+			"minFilter":9987
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":1428,
+			"byteLength":1384,
 			"uri":"door.bin"
 		}
 	]
