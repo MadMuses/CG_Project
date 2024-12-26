@@ -3,7 +3,7 @@
 #include <helpers.h>
 
 void Skybox::initialize(glm::vec3 scale,glm::vec3 position ) {
-	// Define scale of the building geometry
+	// Define scale of the skybox geometry
 	this->scale = scale;
 	this->position = position;
 
@@ -16,7 +16,7 @@ void Skybox::initialize(glm::vec3 scale,glm::vec3 position ) {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
 
-	// Create a vertex buffer object to store the color data
+	// Create a vertex buffer object to store the color data (unused but can be useful for debug)
 	glGenBuffers(1, &colorBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data), color_buffer_data, GL_STATIC_DRAW);
@@ -61,9 +61,12 @@ void Skybox::initialize(glm::vec3 scale,glm::vec3 position ) {
 }
 
 void Skybox::render(glm::mat4 cameraMatrix, glm::vec3 scale) {
+
+	// Bind the relevant shader and vertex program
 	glUseProgram(programID);
 	glBindVertexArray(vertexArrayID);
 
+	// Enable attibute array
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -93,7 +96,7 @@ void Skybox::render(glm::mat4 cameraMatrix, glm::vec3 scale) {
 	glBindBuffer(GL_ARRAY_BUFFER, samplerIndex_buffer_ID);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, 0);
 
-	// Draw "skybox" face by face
+	// Send texture face by face
 	for (int i = 0; i < 6; i++) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, textureIDs[i]);
