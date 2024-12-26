@@ -5,6 +5,7 @@ layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
 layout(location = 2) in vec2 vertexUV;
 
+// Joint matrices IDs and weight
 layout(location = 3) in vec4 j_IDs;
 layout(location = 4) in vec4 j_weights;
 

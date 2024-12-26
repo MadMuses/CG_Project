@@ -8,9 +8,11 @@ in vec2 textureUV;
 
 out vec3 finalColor;
 
+// Light information
 uniform vec3 lightPosition;
 uniform vec3 lightIntensity;
 
+// Managing the color information
 uniform vec4  baseColorFactor;
 uniform float metallicFactor;
 uniform float roughnessFactor;
@@ -22,10 +24,10 @@ void main()
 {
 	vec3 color;
 	if (validTexture == 1.0f){
-		color = texture(textureSampler,textureUV).rgb;
+		color = texture(textureSampler,textureUV).rgb; // Get texture value if there is one
 	}else{
 		// Color (calculated from RGBa)
-		color = vec3(baseColorFactor[0], baseColorFactor[1], baseColorFactor[2]);
+		color = vec3(baseColorFactor[0], baseColorFactor[1], baseColorFactor[2]); // Get the flat colors
 	}
 
 	// Lighting
