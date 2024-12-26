@@ -99,7 +99,7 @@
 		{
 			"mimeType":"image/png",
 			"name":"UV-palette.png",
-			"uri":"../../../../Models/nature/Low%20poly%20Flowers/fbx/UV-palette.png"
+			"uri":"../../textures/nature/flowers.png"
 		}
 	],
 	"skins":[

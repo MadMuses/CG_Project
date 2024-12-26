@@ -82,7 +82,7 @@
 		{
 			"mimeType":"image/png",
 			"name":"Map #1",
-			"uri":"../../../../Models/ship/virgo/source/Virgo/bulky.png"
+			"uri":"../../textures/ships/virgo.png"
 		}
 	],
 	"skins":[

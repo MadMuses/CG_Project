@@ -82,7 +82,7 @@
 		{
 			"mimeType":"image/png",
 			"name":"Map #3",
-			"uri":"../../../../Models/ship/scorpio/source/scorpio.png"
+			"uri":"../../textures/ships/scorpio.png"
 		}
 	],
 	"skins":[

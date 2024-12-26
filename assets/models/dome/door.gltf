@@ -80,7 +80,7 @@
 		{
 			"mimeType":"image/png",
 			"name":"door.png",
-			"uri":"../../../../Models/city/dome/door.png"
+			"uri":"../../textures/dome/door.png"
 		}
 	],
 	"skins":[

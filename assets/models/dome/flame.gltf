@@ -601,7 +601,7 @@
 		{
 			"mimeType":"image/png",
 			"name":"Flame.png.001",
-			"uri":"../../../../Models/flame/Flame.png"
+			"uri":"../../textures/dome/flame.png"
 		}
 	],
 	"skins":[

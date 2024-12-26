@@ -87,7 +87,7 @@
 		{
 			"mimeType":"image/png",
 			"name":"Map #3",
-			"uri":"../../../../Models/ship/gemini/source/twins.png"
+			"uri":"../../textures/ships/gemini.png"
 		}
 	],
 	"skins":[

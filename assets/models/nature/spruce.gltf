@@ -69,7 +69,7 @@
 		{
 			"mimeType":"image/png",
 			"name":"Palette_Gradient.png.001",
-			"uri":"../../../../Models/nature/LowPolyNaturePackLite_Blend/textures/Palette_Gradient.png"
+			"uri":"../../textures/nature/trees.png"
 		}
 	],
 	"skins":[
