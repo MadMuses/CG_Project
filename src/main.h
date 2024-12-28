@@ -57,9 +57,10 @@ bool inDome = true;
 // Handle the case where the viewer is in space
 bool inSpace = false;
 
-// Skybox scale modifier
+// Skybox and dome modifiers
 float skyboxSclMod = 1.0f;
 float domeSclMod = 1.0f;
+glm::vec3 skyboxPosOffset = glm::vec3(0.0f);
 
 //---- Base openGL things ----
 
@@ -241,21 +242,22 @@ void isOOB(gltfObj ships[6], float bound)
 
 glm::vec3 genShipxzy(float bound){
 
-    int zBound = bound/2;
-    int yBound = bound/2;
-    int xBound = bound;
+    int xBound = bound   + skyboxPosOffset.x;
+    int zBoundMax = bound/2 + skyboxPosOffset.z;
+    int zBoundMin = bound/2 - skyboxPosOffset.z;
+    int yBound = bound/3;
 
     // Generate the new positions
     int y = 0 + rand() % yBound;
-    int z = -zBound + rand() % 2*zBound;
+    int z = -zBoundMin + rand() % 2*zBoundMax;
     int x = bound + rand() % xBound;
 
     if (y <= 500)
     {
         if(y % 2 == 0){
-            z = -zBound + rand() % (zBound-500);
+            z = -zBoundMin + rand() % (zBoundMax-500);
         }else{
-            z = 500 + rand() % (zBound-500);
+            z = 500 + rand() % (zBoundMax-500);
         }
     }
     // Send the result as vector
@@ -341,6 +343,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
         glm::vec3 mvtFB;
         glm::vec3 mvtLR;
+        float dim;
 
         if (inDome)
         {
@@ -350,15 +353,21 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         else if (inSpace)
         {
             float d = glm::length(eye_center);
-            float dim = glm::min(1.0f,(boundary*0.6f-d) / d);
-            
-            skyboxSclMod = 1.0f + (1-dim)*0.75;
-            domeSclMod = dim;
+            dim = glm::min(1.0f,(boundary*0.6f-d) / d);
 
+            // The dome will scale down until it reaches 0
+            domeSclMod = glm::max(dim,0.0f);
+
+            // To make movement smoother, dim will not be able to reach 0 here
+            dim = glm::max(dim,0.5f);
+
+            // Scaling up the skybox according to the dim factor
+            skyboxSclMod = 1.0f + (1-dim);
+
+            // Getting the movement values according to the dim factor
             mvtFB = (moveDist*dim) * dirVect;
             mvtLR = (moveDist*dim) * dirSide;
         }
-
 
         // Forward
         if (key == GLFW_KEY_Z || key == GLFW_KEY_W)
@@ -372,6 +381,10 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             {
                 eye_center += mvtFB;
                 lookat += mvtFB;
+                if (dim == 0.5f)
+                {
+                    skyboxPosOffset += mvtFB;
+                }
             }
         }
         // Backward
@@ -386,6 +399,10 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             {
                 eye_center -= mvtFB;
                 lookat -= mvtFB;
+                if (dim == 0.5f)
+                {
+                    skyboxPosOffset -= mvtFB;
+                }
             }
         }
         // Left
@@ -400,7 +417,10 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             {
                 eye_center += mvtLR;
                 lookat += mvtLR;
-
+                if (dim == 0.5f)
+                {
+                    skyboxPosOffset += mvtLR;
+                }
             }
         }
         // Right
@@ -415,7 +435,10 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             {
                 eye_center -= mvtLR;
                 lookat -= mvtLR;
-
+                if (dim == 0.5f)
+                {
+                    skyboxPosOffset -= mvtLR;
+                }
             }
         }
 
@@ -440,6 +463,9 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
                     // Put the viewer in the dome
                     eye_center = glm::vec3(domeBoundIn - 20.0f,20.0f,0.0f);
                     lookat = glm::vec3(domeBoundIn - 20.0f - 100.0f,20.0f,0.0f);
+
+                    // Make sure the skybox offset if at 0
+                    skyboxPosOffset = glm::vec3(0.0f);
 
                     inSpace = false;
                 }

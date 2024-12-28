@@ -347,8 +347,6 @@ int main(void)
         viewMatrix = glm::lookAt(eye_center, lookat, up);
         glm::mat4 vp = projectionMatrix * viewMatrix;
 
-        skybox.render(vp, glm::vec3(skybox.scale*skyboxSclMod));
-
         // Change the mod values if we are far in space
         dome.init_plmt_mod(domeSclMod, domeSclMod);
         door.init_plmt_mod(domeSclMod, domeSclMod);
@@ -365,12 +363,18 @@ int main(void)
         // Classic render
         dome.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
 
-        flowers.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
-        flowers2.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
-
-        for (int i =0; i < 4; i++){grass[i].render(vp,lightPosition,lightIntensity,lvp,depthTexture);}
-        oak.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
-        spruce.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+        // We stop rendering the dome interior when the observer is far enough away to save performances as they cannot be seen anymore
+        if (domeSclMod >= 0.8f)
+        {
+            flowers.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+            flowers2.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+            for (int i =0; i < 4; i++){grass[i].render(vp,lightPosition,lightIntensity,lvp,depthTexture);}
+        }
+        if (domeSclMod >= 0.6f)
+        {
+            oak.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+            spruce.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+        }
 
         // Render the flame
         flame.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
@@ -378,6 +382,10 @@ int main(void)
 
         // Render the bot
         robot.render(vp,lightPosition,lightIntensity,lvp,depthTexture);
+
+        // Placing the skybox
+        skybox.position = skyboxPosOffset; // New pos = offset because skybox is initialized at (0,0,0)
+        skybox.render(vp, glm::vec3(skybox.scale*skyboxSclMod));
 
         // Render and move ships
         moveShips(ships, 0.5f);
