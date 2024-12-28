@@ -234,7 +234,7 @@ void isOOB(gltfObj ships[6], float bound)
 {
     for(int i = 0; i < 6; i++)
     {
-        if(ships[i].position.x < -bound){
+        if(ships[i].position.x < -(bound-skyboxPosOffset.x)){
             shipsOOB[i] = true;
         }
     }
